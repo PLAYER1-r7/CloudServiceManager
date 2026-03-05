@@ -78,6 +78,25 @@ python -m src.cli.main list-services --format csv
 
 See [03_API_DESIGN.md](docs/03_API_DESIGN.md) for complete CLI documentation.
 
+## Development Workflow
+
+### ⚠️ GitHub Project Status Management (MANDATORY)
+
+**Rule: Issue作業開始時は必ずProjectのステータスを更新してください**
+
+```bash
+# Issue作業開始時
+bash .github/scripts/update_project_status.sh <ISSUE_NUM> "In progress"
+
+# PR作成後 (レビュー待ち)
+bash .github/scripts/update_project_status.sh <ISSUE_NUM> "In review"
+
+# PR Merge後 (完了)
+bash .github/scripts/update_project_status.sh <ISSUE_NUM> "Done"
+```
+
+See [.github/PROJECT_WORKFLOW.md](.github/PROJECT_WORKFLOW.md) for detailed workflow guide.
+
 ## Documentation
 
 ### 📚 Documentation Structure
@@ -86,6 +105,21 @@ This project maintains **dual-language documentation**:
 
 - **`/docs`** - English documentation (optimized for AI agents)
 - **`/docs_ja`** - Japanese documentation (for human developers)
+
+### 🌐 User Wiki
+
+For end-user guides and troubleshooting, use the GitHub Wiki:
+
+- **[Wiki Home](https://github.com/PLAYER1-r7/CloudServiceManager/wiki)**
+- **[Getting Started](https://github.com/PLAYER1-r7/CloudServiceManager/wiki/Getting-Started)**
+- **[FAQ](https://github.com/PLAYER1-r7/CloudServiceManager/wiki/FAQ)**
+
+### 📂 Directory Responsibility (MANDATORY)
+
+- **`/docs` and `/docs_ja`**: Product implementation documentation (architecture, API/CLI specs, setup, constraints, checklists)
+- **`/.github`**: Repository operation and GitHub workflow documentation (Issues/PR/Projects workflow, branch protection, automation scripts, agent operation guides)
+- **Rule**: Place documents by purpose first. If a topic spans both domains, keep the primary source in the correct directory and cross-link from the other.
+- **Reference**: See [docs/00_README_DOCS.md](docs/00_README_DOCS.md) for the full documentation policy.
 
 ### 📖 Reading Order (MANDATORY)
 

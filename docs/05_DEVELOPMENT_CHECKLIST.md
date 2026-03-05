@@ -140,6 +140,25 @@ python .github/project_manager.py report
 
 **AI Agent Guide**: See [.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md)
 
+### ⚠️ GitHub Project Status Management (MANDATORY)
+
+**Rule: You MUST update the Project status when starting work on an Issue**
+
+```bash
+# When starting work on an issue
+bash .github/scripts/update_project_status.sh <ISSUE_NUMBER> "In progress"
+
+# After creating a PR (waiting for review)
+bash .github/scripts/update_project_status.sh <ISSUE_NUMBER> "In review"
+
+# After PR merge (completed)
+bash .github/scripts/update_project_status.sh <ISSUE_NUMBER> "Done"
+```
+
+Available statuses: `Backlog`, `Ready`, `In progress`, `In review`, `Done`
+
+Detailed workflow guide: [.github/PROJECT_WORKFLOW.md](../.github/PROJECT_WORKFLOW.md)
+
 ### 6. Start Development
 
 - Read [02_PROJECT_PLAN.md](02_PROJECT_PLAN.md) for overview
