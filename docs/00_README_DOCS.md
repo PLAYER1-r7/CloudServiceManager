@@ -26,6 +26,25 @@ Before working on this project, **you MUST read the documentation in the followi
    - Development setup progress
    - Next features to implement
 
+### 🤖 AI Agent Resources
+
+**For Autonomous Project Management:**
+- **[../.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md)** - Complete AI agent project management guide
+- **[../.github/project_manager.py](../.github/project_manager.py)** - Automated project management script
+- **[../.github/PROJECT_WORKFLOW.md](../.github/PROJECT_WORKFLOW.md)** - Daily workflow and best practices
+
+**Quick Commands:**
+```bash
+# Check what to work on next
+python .github/project_manager.py recommend
+
+# View full project status
+python .github/project_manager.py all
+
+# Generate progress report
+python .github/project_manager.py report
+```
+
 ---
 
 ## **Documentation Guidelines**
@@ -76,6 +95,12 @@ When starting work:
   1. Read 01_PREREQUISITES.md first (mandatory)
   2. Refer to relevant documents based on the task
   
+When starting project management (AI Agents):
+  1. Read ../.github/AI_AGENT_PROJECT_GUIDE.md
+  2. Run: python .github/project_manager.py all
+  3. Review recommended tasks and dependencies
+  4. Select highest priority task with no blockers
+  
 When implementing new features:
   1. Check constraints in 01_PREREQUISITES.md
   2. Review architecture in 02_PROJECT_PLAN.md
@@ -103,6 +128,15 @@ When setting up environment:
 | 03_API_DESIGN.md | CLI/API design specifications | ⚠️ Required for implementation |
 | 04_SETUP.md | Development environment setup guide | ⚠️ Required for initial setup |
 | 05_DEVELOPMENT_CHECKLIST.md | Development progress and checklist | ⭐ Recommended |
+
+**AI Agent Project Management** (in `.github/` directory):
+
+| Filename | Purpose | Audience |
+|----------|---------|----------|
+| AI_AGENT_PROJECT_GUIDE.md | Complete autonomous project management guide | 🤖 AI Agents |
+| project_manager.py | Automated project tracking script | 🤖 AI Agents |
+| PROJECT_WORKFLOW.md | Daily workflow and best practices | All |
+| GITHUB_PROJECT_SETUP.md | GitHub Projects setup instructions | All |
 
 ---
 

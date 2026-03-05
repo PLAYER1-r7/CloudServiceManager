@@ -26,6 +26,25 @@
    - 開発セットアップの進捗状況
    - 次に実装すべき機能
 
+### 🤖 AIエージェント向けリソース
+
+**自律的なプロジェクト管理のために:**
+- **[../.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md)** - 完全なAIエージェントプロジェクト管理ガイド
+- **[../.github/project_manager.py](../.github/project_manager.py)** - 自動プロジェクト管理スクリプト
+- **[../.github/PROJECT_WORKFLOW.md](../.github/PROJECT_WORKFLOW.md)** - 日々のワークフローとベストプラクティス
+
+**クイックコマンド:**
+```bash
+# 次に取り組むべきタスクを確認
+python .github/project_manager.py recommend
+
+# プロジェクトの完全なステータスを表示
+python .github/project_manager.py all
+
+# 進捗レポートを生成
+python .github/project_manager.py report
+```
+
 ---
 
 ## **ドキュメント更新時の注意 / Document Update Guidelines**
@@ -76,6 +95,12 @@
   1. 01_PREREQUISITES.md を必ず読む
   2. タスクに応じて必要なドキュメントを参照
   
+プロジェクト管理を開始する際（AIエージェント）:
+  1. ../.github/AI_AGENT_PROJECT_GUIDE.md を読む
+  2. 実行: python .github/project_manager.py all
+  3. 推奨タスクと依存関係を確認
+  4. ブロッカーがない最高優先順位のタスクを選択
+  
 新機能実装時:
   1. 01_PREREQUISITES.md で制約を確認
   2. 02_PROJECT_PLAN.md でアーキテクチャを確認
@@ -103,6 +128,15 @@
 | 03_API_DESIGN.md | CLI/API 設計仕様 | ⚠️ 機能実装時必須 |
 | 04_SETUP.md | 開発環境セットアップガイド | ⚠️ 初回セットアップ時必須 |
 | 05_DEVELOPMENT_CHECKLIST.md | 開発進捗とチェックリスト | ⭐ 推奨 |
+
+**AIエージェント向けプロジェクト管理** (`.github/` ディレクトリ内):
+
+| ファイル名 | 目的 | 対象読者 |
+|-----------|------|----------|
+| AI_AGENT_PROJECT_GUIDE.md | 完全な自律的プロジェクト管理ガイド | 🤖 AIエージェント |
+| project_manager.py | 自動プロジェクト追跡スクリプト | 🤖 AIエージェント |
+| PROJECT_WORKFLOW.md | 日々のワークフローとベストプラクティス | 全員 |
+| GITHUB_PROJECT_SETUP.md | GitHub Projects セットアップ手順 | 全員 |
 
 ---
 

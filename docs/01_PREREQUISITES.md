@@ -141,6 +141,92 @@ When authentication is required for cloud providers or GitHub operations:
 **Rule**: \"If authentication is needed, always request it explicitly. Never attempt workarounds or substitute authentication.\"
 ---
 
+### GitHub Authentication Rule (MANDATORY)
+
+**GitHub CLI (`gh`) is the ONLY permitted authentication method for GitHub operations.**
+
+#### Permitted Methods
+✅ **GitHub CLI (`gh`)** - ONLY permitted method
+- Install: `brew install gh` (macOS) or `sudo apt install gh` (Linux)
+- Login: `gh auth login`
+- Automatic token management, OAuth-based authentication
+- Use for: Repository setup, issue creation, PR management, automation
+
+✅ **GitHub Actions Built-in Token** - For CI/CD only
+- Use `${{ secrets.GITHUB_TOKEN }}` in GitHub Actions workflows
+- Automatically provided by GitHub Actions
+- Limited to CI/CD automation contexts only
+
+#### Prohibited Methods
+❌ **Personal Access Token (PAT) - Classic** - FORBIDDEN
+- Outdated security model
+- Overly broad permissions
+- Manual token management required
+- Planned for deprecation by GitHub
+
+❌ **Personal Access Token (PAT) - Fine-grained** - FORBIDDEN
+- While more secure than Classic PAT, still requires manual creation
+- Manual expiration management
+- Inferior to GitHub CLI OAuth flow
+- Increases security risk with manual token handling
+
+#### Why GitHub CLI is Required
+
+1. **Security**:
+   - OAuth-based authentication (more secure than static tokens)
+   - Automatic token rotation and refresh
+   - No manual token creation or storage
+   - Reduced risk of token leakage
+
+2. **Convenience**:
+   - One-time `gh auth login` setup
+   - Works across all repositories
+   - No token copying/pasting
+   - Automatic credential management
+
+3. **Best Practice**:
+   - GitHub's recommended authentication method
+   - Industry standard for CLI automation
+   - Better audit trail
+   - Easier team onboarding
+
+#### Setup Instructions
+
+1. **Install GitHub CLI**:
+   ```bash
+   # macOS
+   brew install gh
+   
+   # Linux (Debian/Ubuntu)
+   sudo apt install gh
+   
+   # Windows
+   # Download from: https://cli.github.com/
+   ```
+
+2. **Authenticate**:
+   ```bash
+   gh auth login
+   # Follow interactive prompts to login via browser
+   ```
+
+3. **Verify Authentication**:
+   ```bash
+   gh auth status
+   # Should show: ✓ Logged in to github.com as YOUR_USERNAME
+   ```
+
+#### Enforcement
+
+- Scripts MUST use GitHub CLI for authentication
+- Scripts MUST detect GitHub CLI presence: `gh auth status`
+- Scripts MUST fail with clear error if GitHub CLI is not authenticated
+- Documentation MUST instruct users to use GitHub CLI
+- Code reviews MUST reject any PAT usage
+
+**Rule**: "Always use GitHub CLI (`gh`) for GitHub authentication. Personal Access Tokens (Classic or Fine-grained) are strictly forbidden except for GitHub Actions built-in tokens in CI/CD workflows."
+---
+
 ## **📊 Data Model Specification**
 
 ### CloudService Model (Standardized Service Representation)
@@ -319,7 +405,70 @@ When performing operations on directories:
 **Rule**: \"Always verify directory structure before operations. One confirmation prevents one mistake.\"
 
 ---
+### Incremental Development Rule (MANDATORY)
 
+When creating files, documentation, or implementing features:
+
+1. **MUST CREATE files incrementally (1-3 files at a time)**:
+   - Create 1-3 files, then STOP and wait for confirmation
+   - Never create 5+ files in a single operation
+   - Prevents network timeouts and errors
+   - Allows for review and course correction
+
+2. **File creation strategy**:
+   - ✅ **Priority 1**: Update existing files when possible
+   - ✅ **Priority 2**: Create essential files only
+   - ✅ **Priority 3**: Ask user which optional files to create
+   - ✅ **Priority 4**: Create remaining files incrementally with confirmation
+
+3. **When to pause and confirm**:
+   - After creating 2-3 files
+   - After complex operations or large code changes
+   - When total output exceeds ~500 lines
+   - Before starting next major task or feature
+
+4. **Always confirm with user**:
+   ```
+   ✅ Created X files:
+      - file1.py
+      - file2.md
+   
+   📋 Remaining work:
+      - file3.py
+      - file4.md
+      - file5.json
+   
+   Should I continue with the next 2-3 files?
+   ```
+
+5. **Example - GOOD workflow**:
+   ```
+   Step 1: Create core implementation (1-2 files)
+   [Wait for user confirmation] ✅
+   
+   Step 2: Create documentation (1-2 files)
+   [Wait for user confirmation] ✅
+   
+   Step 3: Create examples and tests (1-2 files)
+   [Wait for user confirmation] ✅
+   ```
+
+6. **Example - BAD workflow** (DO NOT DO THIS):
+   ```
+   Creating 10 files at once:
+   - file1.py, file2.py, file3.py, file4.py, file5.py
+   - doc1.md, doc2.md, doc3.md
+   - test1.py, test2.py
+   ❌ Network timeout occurs
+   ❌ Partial completion, unclear state
+   ❌ Difficult to review
+   ```
+
+**Rationale**: Network constraints and stability. Creating too many files or generating large outputs at once causes network timeouts and errors. Incremental creation ensures stable operation and allows for iterative feedback.
+
+**Rule**: "Create incrementally, confirm frequently. 1-3 files at a time keeps errors at bay."
+
+---
 ## **📦 Dependency Management**
 
 ### requirements.txt
@@ -525,11 +674,39 @@ Before merging to `main`:
    - Request reviewers and address feedback
    - Enable PR status checks and require all checks to pass
 
-3. **Discussions for Planning**:
-   - Use GitHub Discussions for design decisions
-   - Document architectural choices
-   - Record problem-solving approaches
-   - Share knowledge and lessons learned
+3. **Discussions for Planning and Knowledge Sharing**:
+   - Use GitHub Discussions for design decisions and architectural discussions
+   - Document problem-solving approaches and lessons learned
+   - Share knowledge across the team
+   - Record AI agent interactions and automated decision-making processes
+   
+   **Discussion Categories** (recommended structure):
+   - **💡 Ideas** - Feature proposals, improvement suggestions
+   - **🏗️ Architecture & Design** - Design decisions, system architecture discussions
+   - **🤖 AI Agent Sessions** - Record AI agent interactions, automated workflows, and AI-assisted development sessions
+   - **❓ Q&A** - Questions and answers about the project
+   - **📢 Announcements** - Important project updates and milestones
+   - **🎓 Best Practices** - Coding patterns, workflows, and lessons learned
+   - **🐛 Troubleshooting** - Solutions to common problems
+   
+   **Recording AI Agent Interactions**:
+   - Create a new discussion in "🤖 AI Agent Sessions" category for each significant AI-assisted work session
+   - Title format: `[AI Session] YYYY-MM-DD - <Brief description>`
+   - Include:
+     - Context: What problem was being solved
+     - AI Agent prompts and responses (summarized)
+     - Key decisions made during the session
+     - Code changes or files affected
+     - Lessons learned and insights gained
+     - Link to related Issues, PRs, or commits
+   - Example: `[AI Session] 2026-03-05 - GitHub Setup Automation with CLI-only Authentication`
+   
+   **Benefits of Recording AI Sessions**:
+   - Knowledge preservation: Team members can review how decisions were made
+   - Learning resource: Understanding AI-driven development patterns
+   - Audit trail: Track rationale behind architectural choices
+   - Onboarding: New team members can learn from past interactions
+   - Pattern recognition: Identify successful AI collaboration strategies
 
 4. **Project Boards for Organization**:
    - Create GitHub Projects board to track workflow
@@ -598,6 +775,27 @@ Before merging to `main`:
      - Move to "In Review" when PR is marked ready for review
      - Move to "Done" when PR is merged
    - Review board status in daily/weekly standups
+   
+   **Project Management Automation (AI Agents)**:
+   - Use `.github/project_manager.py` script for automated project tracking
+   - **Check project status**:
+     ```bash
+     python .github/project_manager.py status
+     ```
+   - **Get task recommendations** (priority-based):
+     ```bash
+     python .github/project_manager.py recommend
+     ```
+   - **Generate progress reports**:
+     ```bash
+     python .github/project_manager.py report
+     ```
+   - **Full overview** (status + recommendations + report):
+     ```bash
+     python .github/project_manager.py all
+     ```
+   - See `.github/AI_AGENT_PROJECT_GUIDE.md` for complete AI agent workflow
+   - Project URL: https://github.com/users/PLAYER1-r7/projects/1
 
 4. **Issue Templates for Consistency**:
    - Create issue templates in `.github/ISSUE_TEMPLATE/`:
