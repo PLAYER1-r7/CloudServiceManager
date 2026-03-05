@@ -2,6 +2,7 @@
 boto3>=1.28.0           # AWS SDK
 google-cloud-compute>=1.13.0  # GCP SDK
 azure-mgmt-compute>=30.0.0    # Azure Compute SDK
+azure-mgmt-resource>=23.0.0   # Azure Resource SDK
 azure-identity>=1.13.0        # Azure Authentication
 
 # CLI Framework
