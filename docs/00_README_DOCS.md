@@ -58,6 +58,25 @@ python .github/project_manager.py report
 - **Updates**: Record update dates when making significant changes
 - **Language**: All documentation in `/docs` must be in **English** for AI agents. Japanese versions are maintained in `/docs_ja` for human readers.
 - **Command Execution**: Always verify command usage before executing external commands. If usage errors occur, document the correct command in relevant documentation.
+- **Wiki Synchronization**: When work changes user-facing usage, setup, workflows, or troubleshooting, update GitHub Wiki pages in addition to `/docs` and `/docs_ja`.
+
+### Directory Responsibility Policy (MANDATORY)
+
+To keep documentation discoverable and avoid duplication, this project separates documentation by responsibility:
+
+- **`/docs` and `/docs_ja`**: Product and implementation documentation only
+   - Architecture, API/CLI specifications, setup procedures, development constraints, and checklists
+   - Content should answer: "How to build, run, and maintain the product"
+
+- **`/.github`**: Repository operations and GitHub workflow documentation only
+   - GitHub Projects workflow, issue/PR process, branch protection, automation scripts, and agent operation guides
+   - Content should answer: "How to manage work in GitHub and repository operations"
+
+Rules:
+- Do not move product implementation specs into `/.github`.
+- Do not place GitHub operation playbooks inside `/docs` or `/docs_ja`.
+- If a document references both domains, keep the primary source in the correct directory and link to the other directory.
+- When adding a new document, decide the directory by purpose first, then language.
 
 ### External Command Execution Rules
 
@@ -152,6 +171,7 @@ When setting up environment:
 **YOU MUST update documentation after completing ANY work:**
 - ✅ Always update `/docs` (English) first
 - ✅ Then immediately update `/docs_ja` (Japanese)
+- ✅ If user-facing content changed, also update the GitHub Wiki (for example: Home, Getting-Started, FAQ)
 - ✅ Update is not optional - it's a requirement
 - ✅ See [01_PREREQUISITES.md](01_PREREQUISITES.md) for detailed update process
 
