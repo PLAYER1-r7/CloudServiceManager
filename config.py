@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 # Application version (W.X.Y.Z format)
-VERSION = "1.0.1.8"
+VERSION = "1.0.2.0"
 
 # Project root directory
 PROJECT_ROOT = Path(__file__).parent.parent
