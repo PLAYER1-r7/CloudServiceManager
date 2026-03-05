@@ -125,10 +125,26 @@ pytest tests/
 pytest --cov=src tests/
 ```
 
-### 5. Start Development
+### 5. Use Project Management Tools
+
+```bash
+# Check what to work on next
+python .github/project_manager.py all
+
+# View task recommendations
+python .github/project_manager.py recommend
+
+# Track progress
+python .github/project_manager.py report
+```
+
+**AI Agent Guide**: See [.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md)
+
+### 6. Start Development
 
 - Read [02_PROJECT_PLAN.md](02_PROJECT_PLAN.md) for overview
 - Check [03_API_DESIGN.md](03_API_DESIGN.md) for CLI commands
+- Follow priority recommendations from project manager
 - Implement cloud provider features
 - Write tests for new functionality
 

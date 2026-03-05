@@ -127,10 +127,26 @@ pytest tests/
 pytest --cov=src tests/
 ```
 
-### 6. 開発の開始
+### 6. プロジェクト管理ツールの活用
+
+```bash
+# 次に取り組むべきタスクを確認
+python .github/project_manager.py all
+
+# タスク推奨事項を表示
+python .github/project_manager.py recommend
+
+# 進捗状況を追跡
+python .github/project_manager.py report
+```
+
+**AI エージェントガイド**: [.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md) を参照
+
+### 7. 開発の開始
 
 - 概要については [02_PROJECT_PLAN.md](02_PROJECT_PLAN.md) を読む
 - CLI コマンドについては [03_API_DESIGN.md](03_API_DESIGN.md) を確認
+- プロジェクトマネージャーからの優先順位推奨に従う
 - クラウドプロバイダー機能の実装
 - 新機能のテストを記述
 
