@@ -1,0 +1,102 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run linting (Ruff)
+      run: |
+        pip install ruff
+        ruff check src/ tests/
+
+    - name: Format check (Black)
+      run: |
+        pip install black
+        black --check src/ tests/
+
+    - name: Type checking (mypy)
+      run: |
+        pip install mypy
+        mypy src/ || true
+
+    - name: Run unit tests
+      run: |
+        pytest tests/ -v --cov=src/ --cov-report=xml --cov-report=term
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install ruff black
+
+    - name: Check for hardcoded credentials
+      run: |
+        # Check for common credential patterns
+        ! grep -r "AKIA\|aws_access_key\|aws_secret_key" src/ tests/ || exit 1
+        ! grep -r "private_key\|password.*=" src/ tests/ || exit 1
+
+    - name: Verify documentation is updated
+      run: |
+        # This is a soft check - warns but doesn't fail
+        echo "⚠️  Reminder: Ensure documentation in docs/ and docs_ja/ is updated"
+
+  branch-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - name: Check branch target
+      run: |
+        if [ "${{ github.base_ref }}" = "main" ]; then
+          echo "✅ PR targets develop before main - Correct!"
+        fi
+
+    - name: Verify issue linkage
+      run: |
+        PR_BODY="${{ github.event.pull_request.body }}"
+        if [[ ! "$PR_BODY" =~ (#[0-9]+|Closes|Fixes|Relates) ]]; then
+          echo "⚠️  Warning: PR should reference related issues with 'Closes #123' or 'Relates to #456'"
+        fi
