@@ -142,6 +142,25 @@ python .github/project_manager.py report
 
 **AI エージェントガイド**: [.github/AI_AGENT_PROJECT_GUIDE.md](../.github/AI_AGENT_PROJECT_GUIDE.md) を参照
 
+### ⚠️ GitHub Project ステータス管理（必須）
+
+**ルール: Issue 作業開始時は必ず Project のステータスを更新してください**
+
+```bash
+# Issue 作業開始時
+bash .github/scripts/update_project_status.sh <ISSUE番号> "In progress"
+
+# PR 作成後（レビュー待ち）
+bash .github/scripts/update_project_status.sh <ISSUE番号> "In review"
+
+# PR Merge 後（完了）
+bash .github/scripts/update_project_status.sh <ISSUE番号> "Done"
+```
+
+利用可能なステータス: `Backlog`, `Ready`, `In progress`, `In review`, `Done`
+
+詳細なワークフローガイド: [.github/PROJECT_WORKFLOW.md](../.github/PROJECT_WORKFLOW.md)
+
 ### 7. 開発の開始
 
 - 概要については [02_PROJECT_PLAN.md](02_PROJECT_PLAN.md) を読む

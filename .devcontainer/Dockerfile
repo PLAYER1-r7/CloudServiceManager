@@ -20,12 +20,11 @@ RUN pip install --upgrade pip setuptools wheel
 # Install development tools
 RUN pip install \
   black \
+  ruff \
   flake8 \
   mypy \
   pytest \
-  pytest-cov \
-  ipython \
-  jupyter
+  pytest-cov
 
 # Default command
 CMD ["/bin/bash"]

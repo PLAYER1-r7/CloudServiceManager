@@ -284,6 +284,7 @@ pytest -k "aws"          # Run specific tests only
 **CRITICAL**: After completing ANY work, you MUST update documentation:
 - ✅ Update relevant technical documentation in `/docs` (English)
 - ✅ Update corresponding documentation in `/docs_ja` (Japanese)
+- ✅ If user-facing behavior changed (usage/setup/workflow/troubleshooting), update GitHub Wiki pages as well (for example: Home, Getting-Started, FAQ)
 - ✅ Update `05_DEVELOPMENT_CHECKLIST.md` to reflect progress
 - ✅ If adding new features, update `03_API_DESIGN.md`
 - ✅ If changing architecture, update `02_PROJECT_PLAN.md`
@@ -295,6 +296,7 @@ pytest -k "aws"          # Run specific tests only
 - [ ] Does \`pytest\` pass?
 - [ ] No hardcoded credentials?
 - [ ] Updated documentation?
+- [ ] Updated GitHub Wiki when relevant?
 ### External Command Execution Rules
 **MANDATORY when executing external commands (CLI tools, APIs, etc.):**
 

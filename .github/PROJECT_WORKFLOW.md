@@ -74,6 +74,74 @@ Your GitHub Project is now set up! Here's how to use it effectively.
 
 ## 🔄 Daily Workflow
 
+### ⚠️ **MANDATORY: Update Project Status**
+
+**ルール: Issue作業開始時は必ずProjectのステータスを更新してください**
+
+#### Issue作業開始時
+
+```bash
+# 1. Issue番号を確認
+ISSUE_NUM=6  # 例: Issue #6を開始する場合
+
+# 2. Project Item IDとField IDを取得（初回のみ）
+gh project item-list 1 --owner PLAYER1-r7 --limit 20 --format json | \
+  jq -r ".items[] | select(.content.number == $ISSUE_NUM) | {id: .id, status: .status}"
+
+# 3. Status field IDを取得（初回のみ）
+gh project field-list 1 --owner PLAYER1-r7 --format json | \
+  jq -r '.fields[] | select(.name == "Status") | .options[] | {name: .name, id: .id}'
+
+# 4. ステータスを "In progress" に更新
+gh project item-edit \
+  --project-id PVT_kwHOBs4glc4BQ4Vr \
+  --id <ITEM_ID> \
+  --field-id PVTSSF_lAHOBs4glc4BQ4Vrzg-32gc \
+  --single-select-option-id 47fc9ee4
+
+# 確認
+gh project item-list 1 --owner PLAYER1-r7 --format json | \
+  jq -r ".items[] | select(.content.number == $ISSUE_NUM) | {number: .content.number, status: .status}"
+```
+
+**簡易スクリプト（推奨）:**
+
+```bash
+# .github/scripts/update_project_status.sh として保存推奨
+#!/bin/bash
+ISSUE_NUM=$1
+STATUS=$2  # "In progress" or "Done" or "Ready" or "In review"
+
+# Status option IDs
+declare -A STATUS_IDS=(
+  ["Backlog"]="f75ad846"
+  ["Ready"]="61e4505c"
+  ["In progress"]="47fc9ee4"
+  ["In review"]="df73e18b"
+  ["Done"]="98236657"
+)
+
+ITEM_ID=$(gh project item-list 1 --owner PLAYER1-r7 --format json | \
+  jq -r ".items[] | select(.content.number == $ISSUE_NUM) | .id")
+
+gh project item-edit \
+  --project-id PVT_kwHOBs4glc4BQ4Vr \
+  --id "$ITEM_ID" \
+  --field-id PVTSSF_lAHOBs4glc4BQ4Vrzg-32gc \
+  --single-select-option-id "${STATUS_IDS[$STATUS]}"
+
+echo "✅ Issue #$ISSUE_NUM → $STATUS"
+```
+
+使用例:
+```bash
+# Issue #6を開始
+bash .github/scripts/update_project_status.sh 6 "In progress"
+
+# Issue #2を完了
+bash .github/scripts/update_project_status.sh 2 "Done"
+```
+
 ### Morning Routine
 
 ```bash
@@ -84,7 +152,7 @@ gh issue list --repo PLAYER1-r7/CloudServiceManager --json number,title,state
 gh issue view 2 --repo PLAYER1-r7/CloudServiceManager
 
 # 3. Start working on an issue
-# → Move card to "In Progress" in project board
+# → ⚠️ MUST: Move card to "In Progress" in project board (see above)
 ```
 
 ### During Development
@@ -106,13 +174,19 @@ gh issue view 2 --repo PLAYER1-r7/CloudServiceManager
    ```
 
 4. **Update project board**
-   - Move card to "In Review"
+   ```bash
+   # ⚠️ MUST: PRレビュー待ちにステータス更新
+   bash .github/scripts/update_project_status.sh <ISSUE_NUM> "In review"
+   ```
 
 ### After PR Merge
 
 1. **Issue auto-closes** when PR is merged
-2. **Move card to "Done"** in project board
-3. **Start next issue** from Todo column
+2. **⚠️ MUST: Move card to "Done"** in project board
+   ```bash
+   bash .github/scripts/update_project_status.sh <ISSUE_NUM> "Done"
+   ```
+3. **Start next issue** from Todo column (ステータスを "In progress" に更新)
 
 ---
 

@@ -156,7 +156,8 @@ gh project item-add 1 \
    - Create feature branch
    - Implement changes
    - Write tests
-   - Update documentation
+   - Update documentation (`/docs` and `/docs_ja`)
+   - Update GitHub Wiki as well if user-facing behavior changed (usage/setup/workflow/troubleshooting)
 
 6. **Create Pull Request**
    ```bash
@@ -217,7 +218,8 @@ python .github/project_manager.py status
 
 - [ ] All tests passing
 - [ ] Code coverage ≥ 80%
-- [ ] Documentation updated
+- [ ] Documentation updated (`/docs` and `/docs_ja`)
+- [ ] GitHub Wiki updated when relevant
 - [ ] PR created and linked to issue
 - [ ] Project status updated to "In Review"
 - [ ] Generate progress report
