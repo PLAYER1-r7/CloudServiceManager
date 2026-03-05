@@ -1,5 +1,261 @@
 # はじめに - CloudServiceManager
 
+> マルチクラウド環境を統一的に管理する CLI ツール
+
+**現在のステータス**: Phase 1（CLI開発）進行中 - バージョン 1.0.1.7
+
+---
+
+## 📖 このガイドについて
+
+CloudServiceManagerは現在開発中のプロジェクトです。このガイドでは、開発者がプロジェクトに参加するための手順を説明します。
+
+**⚠️ 注意**: エンドユーザー向けの機能は Phase 1 完了後に利用可能になります。
+
+---
+
+## 🎯 前提条件
+
+### 必須ツール
+
+- **Docker** と **Docker Compose**
+- **VS Code** と **Remote Containers 拡張機能**
+- **Git** (2.30+)
+- **GitHub アカウント**
+
+### 推奨環境
+
+- Linux、macOS、または WSL2 上の Windows
+- 8GB+ RAM
+- 10GB+ ディスク空き容量
+
+---
+
+## 🚀 セットアップ手順
+
+### 1. リポジトリのクローン
+
+```bash
+git clone https://github.com/PLAYER1-r7/CloudServiceManager.git
+cd CloudServiceManager
+```
+
+### 2. DevContainer で開く
+
+```bash
+# VS Code でプロジェクトを開く
+code .
+
+# コマンドパレットを開く (Ctrl+Shift+P または Cmd+Shift+P)
+# 「Remote-Containers: Reopen in Container」を選択
+
+# コンテナのビルドを待つ（初回は 2〜3 分）
+```
+
+### 3. インストールの確認
+
+DevContainer が起動したら、ターミナルで確認:
+
+```bash
+# Python バージョン確認
+python --version
+# 出力: Python 3.11.x
+
+# 依存関係確認
+pip list | grep -E "boto3|pydantic|pytest"
+
+# テスト実行
+pytest tests/ -v
+# 出力: 31 passed, 2 skipped
+```
+
+---
+
+## 🧪 現在利用可能な機能
+
+### CloudService データモデル（✅ 完了）
+
+```python
+from src.cli.models.service import CloudService, CloudProvider
+
+# CloudService インスタンスの作成
+service = CloudService(
+    provider=CloudProvider.AWS,
+    service_type="EC2",
+    resource_id="i-1234567890abcdef0",
+    name="web-server-01",
+    region="us-east-1",
+    status="running",
+    created_at="2026-03-05T10:00:00Z"
+)
+
+# JSON にシリアライズ
+json_data = service.model_dump_json()
+
+# 辞書から復元
+service_dict = service.model_dump()
+restored = CloudService(**service_dict)
+```
+
+**テストカバレッジ**: 95%（31 テスト合格）
+
+---
+
+## 📚 開発ドキュメント
+
+### 必読ドキュメント（順番に読む）
+
+1. **[前提条件](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/01_PREREQUISITES.md)** - 技術スタックと制約
+2. **[プロジェクト計画](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/02_PROJECT_PLAN.md)** - 全体のロードマップ
+3. **[CLI設計](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/03_API_DESIGN.md)** - コマンド仕様
+4. **[セットアップガイド](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/04_SETUP.md)** - 開発環境構築
+5. **[開発チェックリスト](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/05_DEVELOPMENT_CHECKLIST.md)** - 進捗状況
+
+### プロジェクト管理
+
+- **[GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1)** - タスク管理
+- **[GitHub Issues](https://github.com/PLAYER1-r7/CloudServiceManager/issues)** - 開発タスク一覧
+- **[Pull Requests](https://github.com/PLAYER1-r7/CloudServiceManager/pulls)** - コードレビュー
+
+---
+
+## 🔄 開発ワークフロー
+
+### Issue の選択
+
+```bash
+# 利用可能な Issue を確認
+gh issue list --repo PLAYER1-r7/CloudServiceManager
+
+# 特定の Issue を表示
+gh issue view 6 --repo PLAYER1-r7/CloudServiceManager
+```
+
+### Issue 開始時（必須）
+
+```bash
+# Project のステータスを "In progress" に更新
+bash .github/scripts/update_project_status.sh 6 "In progress"
+```
+
+### ブランチ作成とコミット
+
+```bash
+# feature ブランチを作成
+git checkout -b feature/issue-6-authentication
+
+# 変更をコミット（バージョンを増やす）
+# config.py の VERSION を更新してからコミット
+git add .
+git commit -m "feat(#6): implement AWS authentication
+
+Version: 1.0.1.X"
+```
+
+### PR 作成
+
+```bash
+# ブランチをプッシュ
+git push -u origin feature/issue-6-authentication
+
+# PR を作成
+gh pr create --base develop --title "feat: Issue #6 Authentication" --body "Closes #6"
+
+# ステータスを更新
+bash .github/scripts/update_project_status.sh 6 "In review"
+```
+
+### マージ後
+
+```bash
+# ステータスを更新
+bash .github/scripts/update_project_status.sh 6 "Done"
+```
+
+詳細: [PROJECT_WORKFLOW.md](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/.github/PROJECT_WORKFLOW.md)
+
+---
+
+## 🧪 テストの実行
+
+```bash
+# すべてのテストを実行
+pytest tests/ -v
+
+# カバレッジ付きで実行
+pytest --cov=src --cov-report=term-missing tests/
+
+# 特定のテストファイルのみ
+pytest tests/test_models.py -v
+```
+
+**現在のカバレッジ**: 95%（CloudService モデル）
+
+---
+
+## 📦 バージョン管理
+
+**形式**: `W.X.Y.Z`（例: 1.0.1.7）
+
+- **W** (Major): ユーザー指示による戦略的変更
+- **X** (Minor): ユーザー指示による機能追加
+- **Y** (Development): develop ブランチへのプッシュごとに +1
+- **Z** (Commit): 各コミットで +1
+
+**ルール**: 各コミット前に `config.py` の `VERSION` を更新
+
+---
+
+## 🔧 トラブルシューティング
+
+### DevContainer が起動しない
+
+```bash
+# Docker を再起動
+sudo systemctl restart docker
+
+# コンテナを再ビルド
+# VS Code: Remote-Containers: Rebuild Container
+```
+
+### テストが失敗する
+
+```bash
+# 依存関係を再インストール
+pip install -r requirements.txt --upgrade
+
+# キャッシュをクリア
+pytest --cache-clear tests/
+```
+
+### 詳細は [FAQ](FAQ) を参照
+
+---
+
+## 🤝 コントリビューション
+
+1. [Issue を選ぶ](https://github.com/PLAYER1-r7/CloudServiceManager/issues)
+2. Project ステータスを "In progress" に更新
+3. feature ブランチで実装
+4. テストを書く（カバレッジ 80%以上）
+5. PR を作成
+6. マージ後、ステータスを "Done" に更新
+
+---
+
+## 📞 サポート
+
+- **Issues**: [GitHub Issues](https://github.com/PLAYER1-r7/CloudServiceManager/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/PLAYER1-r7/CloudServiceManager/discussions)
+
+---
+
+## ⏭️ 次のステップ
+
+- [FAQ](FAQ) でよくある質問を確認
+- [開発チェックリスト](https://github.com/PLAYER1-r7/CloudServiceManager/blob/develop/docs_ja/05_DEVELOPMENT_CHECKLIST.md) で現在の進捗を確認
+- [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) で次の Issue を選ぶ
+
 このガイドでは、CloudServiceManagerのインストールから最初のコマンド実行までを説明します。
 
 ---

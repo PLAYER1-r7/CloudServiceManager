@@ -60,13 +60,30 @@ Phase 1（CLI開発）完了後に公開予定：
 
 ### ✅ Phase 1: CLI開発（2026年3月 - 進行中）
 
-**進行中のタスク**:
-- CloudService データモデル実装
-- クラウドプロバイダー認証
-- AWS/GCP/Azure プロバイダー実装
-- `list-services` コマンド実装
+**現在のバージョン**: `1.0.1.7`（2026年3月5日）
 
-**進捗**: [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) で確認
+**完了したタスク**:
+- ✅ **Issue #2**: CloudService データモデル完成・テスト
+  - Pydantic BaseModel への移行完了
+  - **95% テストカバレッジ達成**（目標: 80%以上）
+  - 31 テスト合格（27 ユニット + 6 統合）
+  - ISO 8601 タイムスタンプ検証実装
+  - PR #17 でマージ完了
+
+**進行中のタスク**:
+- 🚧 **Issue #6**: クラウドプロバイダー認証実装
+  - AWS/GCP/Azure 認証メカニズム
+  - 環境変数ハンドリング
+  - 認証情報の検証
+
+**今後のタスク**:
+- 📋 Issue #5: Week 2: AWS プロバイダー実装
+- 📋 Issue #1: list-services コマンド実装完成
+- 📋 Issue #3: Week 3: GCP プロバイダー実装
+- 📋 Issue #7: Week 3: Azure プロバイダー実装
+- 📋 Issue #4: Week 4: 統合テストと最適化
+
+**進捗**: [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) で確認（1/7 Issues 完了、14%）
 
 ### 🔮 Phase 2: Webアプリケーション（計画中）
 
