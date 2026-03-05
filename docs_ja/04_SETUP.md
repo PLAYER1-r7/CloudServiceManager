@@ -32,6 +32,12 @@
 | **Docker** | 20.10+ | `docker --version` |
 | **VS Code** | 最新版 | - |
 | **Remote - Containers 拡張** | 最新版 | VS Code Extensions で確認 |
+| **GitHub CLI** | 2.46+ | `gh --version` |
+
+### GitHub アカウント設定
+- GitHub アカウント（コード協力用）
+- Fine-grained Personal Access Token（認証用）
+- 下記の「Step 4: GitHub セットアップ」を参照
 
 ### クラウドアカウント（オプション）
 実際のクラウドリソースを操作する場合：

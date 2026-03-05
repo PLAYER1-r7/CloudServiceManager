@@ -31,8 +31,12 @@ Ensure the following are installed:
 |------------|---------|---------------------|
 | **Docker** | 20.10+ | \`docker --version\` |
 | **VS Code** | Latest | - |
-| **Remote - Containers Extension** | Latest | Check in VS Code Extensions |
+| **Remote - Containers Extension** | Latest | Check in VS Code Extensions || **GitHub CLI** | 2.46+ | `gh --version` |
 
+### GitHub Account Setup
+- GitHub account (for code collaboration)
+- Fine-grained Personal Access Token (for authentication)
+- See "Step 4: GitHub Setup" below
 ### Cloud Accounts (Optional)
 To work with actual cloud resources:
 - AWS account
@@ -100,6 +104,109 @@ pip list | grep -E "typer|boto3|google-cloud|azure"
 - azure-mgmt-compute - Azure SDK
 - rich - CLI output
 - pytest, pytest-cov - Testing framework
+
+---
+
+### Step 4: GitHub Setup (For Code Collaboration)
+
+The project is hosted on GitHub. Initialize Git and set up remote:
+
+#### Step 4a: Initialize Local Git Repository
+
+```bash
+cd /workspaces/CloudServiceManager
+
+# Initialize git (if not already done)
+git init
+
+# Configure user information
+git config user.name "Your Name"
+git config user.email "your.email@example.com"
+
+# Add all files and commit
+git add -A
+git commit -m "Initial commit: Project structure and documentation"
+```
+
+#### Step 4b: GitHub CLI Authentication
+
+For secure authentication without Classic tokens (recommended approach):
+
+```bash
+# Install GitHub CLI (if not available)
+apt update && apt install -y gh
+
+# Authenticate with GitHub CLI
+gh auth login
+
+# Select GitHub.com
+# Choose: Authenticate via web browser
+# Follow the browser prompts to authorize the application
+
+# Verify authentication
+gh auth status
+# Output should show: ✓ Logged in to github.com account <username>
+```
+
+#### Step 4c: Create Remote Repository
+
+For new repositories:
+
+```bash
+# Create repository on GitHub and push code
+gh repo create CloudServiceManager --public --source=. --remote=origin --push
+```
+
+For existing repositories:
+
+```bash
+# Add remote and push
+git remote add origin https://github.com/PLAYER1-r7/CloudServiceManager.git
+git push -u origin master
+```
+
+**Repository Information**:
+- **URL**: https://github.com/PLAYER1-r7/CloudServiceManager
+- **Owner**: PLAYER1-r7
+- **Visibility**: Public
+- **Default Branch**: master
+
+Verify connection:
+
+```bash
+git remote -v
+# Should output:
+# origin  https://github.com/PLAYER1-r7/CloudServiceManager.git (fetch)
+# origin  https://github.com/PLAYER1-r7/CloudServiceManager.git (push)
+```
+
+---
+
+### Step 5: View Project Issues
+
+Development tasks are tracked as GitHub Issues. View them with:
+
+```bash
+# List all issues
+gh issue list --repo PLAYER1-r7/CloudServiceManager
+
+# View specific issue
+gh issue view <issue-number> --repo PLAYER1-r7/CloudServiceManager
+
+# Filter issues by label
+gh issue list --repo PLAYER1-r7/CloudServiceManager --label "week-2"
+```
+
+**Created Development Issues**:
+- CloudService データモデル完成・テスト (#1)
+- クラウド認証メカニズム実装 (#2)
+- Week 3: GCP プロバイダー実装 (#3)
+- Week 4: 統合テストと最適化 (#4)
+- Week 2: AWS プロバイダー実装 (#5)
+- list-services コマンド実装完成 (#6)
+- Week 3: Azure プロバイダー実装 (#7)
+
+See [GitHub Issues](https://github.com/PLAYER1-r7/CloudServiceManager/issues) for full details.
 
 ---
 

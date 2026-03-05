@@ -46,11 +46,48 @@
 - [x] Azure provider (`src/cli/providers/azure.py`)
 - [x] Tests structure (`tests/`)
 
+### GitHub Repository Setup ✅
+
+- [x] Installed GitHub CLI (`gh`)
+- [x] Authenticated with GitHub (Fine-grained token)
+- [x] Created remote repository: https://github.com/PLAYER1-r7/CloudServiceManager
+- [x] Pushed initial commit
+- [x] Created 7 GitHub Issues for development tracking
+  - CloudService model implementation
+  - Cloud provider authentication
+  - AWS/GCP/Azure provider implementations
+  - list-services command implementation
+  - Integration tests and optimization
+
 ---
 
 ## **🎯 Next Steps**
 
-### 1. Open in DevContainer
+### 1. View Development Tasks
+
+All development tasks are tracked as GitHub Issues:
+
+```bash
+# List all issues
+gh issue list --repo PLAYER1-r7/CloudServiceManager
+
+# View issue details
+gh issue view 5 --repo PLAYER1-r7/CloudServiceManager  # Example: Week 2 - AWS Implementation
+
+# Filter by week
+gh issue list --repo PLAYER1-r7/CloudServiceManager --label "week-2"
+```
+
+**Development Issues Created**:
+- [#1](https://github.com/PLAYER1-r7/CloudServiceManager/issues/1) - CloudService データモデル完成・テスト
+- [#2](https://github.com/PLAYER1-r7/CloudServiceManager/issues/2) - クラウド認証メカニズム実装
+- [#3](https://github.com/PLAYER1-r7/CloudServiceManager/issues/3) - Week 3: GCP プロバイダー実装
+- [#4](https://github.com/PLAYER1-r7/CloudServiceManager/issues/4) - Week 4: 統合テストと最適化
+- [#5](https://github.com/PLAYER1-r7/CloudServiceManager/issues/5) - Week 2: AWS プロバイダー実装
+- [#6](https://github.com/PLAYER1-r7/CloudServiceManager/issues/6) - list-services コマンド実装完成
+- [#7](https://github.com/PLAYER1-r7/CloudServiceManager/issues/7) - Week 3: Azure プロバイダー実装
+
+### 2. Open in DevContainer
 
 ```bash
 # In VS Code:
@@ -59,7 +96,7 @@
 # 3. Wait for container build (2-3 minutes first time)
 ```
 
-### 2. Verify Installation
+### 3. Verify Installation
 
 ```bash
 python --version        # Should be Python 3.11+
@@ -67,15 +104,15 @@ pip list               # Should show installed packages
 pytest --version       # Should be installed
 ```
 
-### [04_SETUP.md](04_SETUP.md)oud Credentials
+### 4. Set Up Cloud Credentials
 
-See `docs/SETUP.md` for provider-specific setup:
+See [04_SETUP.md](04_SETUP.md) for provider-specific setup:
 
 - AWS: Set `~/.aws/credentials` or `AWS_*` environment variables
 - GCP: Set `GOOGLE_APPLICATION_CREDENTIALS` environment variable
 - Azure: Set `AZURE_*` environment variables or use `az login`
 
-### 4. Test the Setup
+### 5. Test the Setup
 
 ```bash
 # Run CLI help
