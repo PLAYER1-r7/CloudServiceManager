@@ -60,7 +60,7 @@ Phase 1（CLI開発）完了後に公開予定：
 
 ### ✅ Phase 1: CLI開発（2026年3月 - 進行中）
 
-**現在のバージョン**: `1.0.1.7`（2026年3月5日）
+**現在のバージョン**: `1.0.3.0`（2026年3月5日）
 
 **完了したタスク**:
 - ✅ **Issue #2**: CloudService データモデル完成・テスト
@@ -70,20 +70,31 @@ Phase 1（CLI開発）完了後に公開予定：
   - ISO 8601 タイムスタンプ検証実装
   - PR #17 でマージ完了
 
+- ✅ **Issue #6**: クラウドプロバイダー認証実装
+  - AWS/GCP/Azure 認証メカニズム完成
+  - CloudAuthBase 抽象基底クラス
+  - AWSAuth, GCPAuth, AzureAuth 実装
+  - CloudAuthManager でマルチクラウド管理
+  - 46 テスト、62% カバレッジ
+  - PR #18 でマージ完了
+
+- ✅ **Issue #5**: AWS プロバイダー実装
+  - AWSAuth 統合済み AWSProvider クラス
+  - EC2 インスタンスの一覧取得（単一/全リージョン）
+  - CloudService モデルへの変換
+  - エラーハンドリング完備
+  - 17 テスト、85% カバレッジ
+
 **進行中のタスク**:
-- 🚧 **Issue #6**: クラウドプロバイダー認証実装
-  - AWS/GCP/Azure 認証メカニズム
-  - 環境変数ハンドリング
-  - 認証情報の検証
+- なし（待機中）
 
 **今後のタスク**:
-- 📋 Issue #5: Week 2: AWS プロバイダー実装
 - 📋 Issue #1: list-services コマンド実装完成
 - 📋 Issue #3: Week 3: GCP プロバイダー実装
 - 📋 Issue #7: Week 3: Azure プロバイダー実装
 - 📋 Issue #4: Week 4: 統合テストと最適化
 
-**進捗**: [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) で確認（1/7 Issues 完了、14%）
+**進捗**: [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) で確認（3/7 Issues 完了、43%）
 
 ### 🔮 Phase 2: Webアプリケーション（計画中）
 
