@@ -183,10 +183,17 @@ This project uses **GitHub Projects** for task tracking and workflow management.
 
 ### 📝 Current Issues (7 total)
 
+#### ✅ Completed Issues (2/7)
+
+| Issue | Title | Completion |
+|-------|-------|-----------|
+| [#2](https://github.com/PLAYER1-r7/CloudServiceManager/issues/2) | CloudService データモデル完成・テスト | ✅ Mar 2026 |
+| [#6](https://github.com/PLAYER1-r7/CloudServiceManager/issues/6) | クラウドプロバイダー認証実装 | ✅ Mar 2026 |
+
+#### 🚧 Ongoing & Planned Issues (5/7)
+
 | Issue | Title | Week | Priority |
 |-------|-------|------|----------|
-| [#2](https://github.com/PLAYER1-r7/CloudServiceManager/issues/2) | CloudService データモデル完成・テスト | - | 🔴 High |
-| [#6](https://github.com/PLAYER1-r7/CloudServiceManager/issues/6) | クラウドプロバイダー認証実装 | - | 🔴 High |
 | [#5](https://github.com/PLAYER1-r7/CloudServiceManager/issues/5) | Week 2: AWS プロバイダー実装 | Week 2 | 🟡 Medium |
 | [#1](https://github.com/PLAYER1-r7/CloudServiceManager/issues/1) | list-services コマンド実装完成 | - | 🟡 Medium |
 | [#3](https://github.com/PLAYER1-r7/CloudServiceManager/issues/3) | Week 3: GCP プロバイダー実装 | Week 3 | 🟢 Low |

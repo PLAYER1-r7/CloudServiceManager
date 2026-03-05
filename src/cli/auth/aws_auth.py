@@ -86,10 +86,11 @@ class AWSAuth(CloudAuthBase):
             sts = self._session.client("sts")
             sts.get_caller_identity()
             return True
-        except ClientError:
+        except (ClientError, NoCredentialsError):
             self._is_authenticated = False
             return False
         except Exception:
+            self._is_authenticated = False
             return False
     
     def get_credentials(self) -> Dict[str, Any]:

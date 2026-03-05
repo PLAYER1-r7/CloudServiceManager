@@ -3,10 +3,30 @@ Configuration for development environment.
 """
 
 import os
+import subprocess
 from pathlib import Path
 
+
+def get_commit_count():
+    """Get the current commit count from git."""
+    try:
+        count = subprocess.run(
+            ["git", "rev-list", "--count", "HEAD"],
+            cwd=Path(__file__).parent,
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return count.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return "0"
+
+
 # Application version (W.X.Y.Z format)
-VERSION = "1.0.2.0"
+# Z = commit count
+BASE_VERSION = "1.0.2"
+COMMIT_COUNT = get_commit_count()
+VERSION = f"{BASE_VERSION}.{COMMIT_COUNT}"
 
 # Project root directory
 PROJECT_ROOT = Path(__file__).parent.parent

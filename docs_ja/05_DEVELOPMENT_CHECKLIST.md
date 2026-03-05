@@ -40,11 +40,53 @@
 ### コード構造 ✅
 
 - [x] CLI エントリーポイント (`src/cli/main.py`)
-- [x] データモデル (`src/cli/models/service.py`)
+- [x] データモデル (`src/cli/models/service.py`) - **Issue #2 ✅ 完了 (95%カバレッジ)**
 - [x] AWS プロバイダー (`src/cli/providers/aws.py`)
 - [x] GCP プロバイダー (`src/cli/providers/gcp.py`)
 - [x] Azure プロバイダー (`src/cli/providers/azure.py`)
 - [x] テスト構造 (`tests/`)
+
+### Issue 完了状況 📊
+
+#### ✅ 完了済み
+
+- **Issue #2**: CloudService Pydantic モデル (完了)
+  - 7つの必須フィールドを持つ Pydantic CloudService モデルを作成
+  - ISO 8601 日時検証
+  - 95% テストカバレッジ (31 テスト成功)
+  - バージョン: 1.0.0.0 → 1.0.1.8
+
+- **Issue #6**: クラウドプロバイダー認証実装 (完了 - PR #18 マージ済み)
+  - CloudAuthBase 抽象基底クラス (84行)
+  - AWSAuth 実装 (156行) - boto3 Session、環境変数、credentials ファイル、IAM ロール
+  - GCPAuth 実装 (179行) - Application Default Credentials、サービスアカウント
+  - AzureAuth 実装 (168行) - DefaultAzureCredential チェーン
+  - マルチクラウド管理用 CloudAuthManager (217行)
+  - 包括的なテストスイート (46テスト、62%カバレッジ)
+  - 依存関係追加: azure-mgmt-resource
+  - バージョン: 1.0.1.8 → 1.0.2.0
+
+#### 🚧 実装中
+なし (待機中)
+
+#### � CI/CD インフラストラクチャ (完了)
+
+- **GitHub Actions パイプライン**
+  - ✅ ユニットテストのモック・パッチング修正 (46テスト、すべてパス)
+  - ✅ AWS 認証テスト失敗を解決
+  - ✅ Azure 認証テスト失敗を解決
+  - ✅ GCP 認証テスト失敗を解決
+  - ✅ CI/CD ワークフローが正常に機能
+  - テストカバレッジ: 114 パス、2 スキップ
+  - **修正日**: 2026-03-05
+  - **解決した問題**: 3つのクラウドプロバイダー全てのモック・パッチパスを修正
+
+#### �📋 保留中
+- Issue #5: AWS プロバイダー実装
+- Issue #1: list-services コマンド実装
+- Issue #3: GCP プロバイダー実装
+- Issue #7: Azure プロバイダー実装
+- Issue #4: 統合テストと最適化
 
 ### GitHub リポジトリセットアップ ✅
 
