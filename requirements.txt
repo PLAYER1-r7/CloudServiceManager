@@ -12,11 +12,14 @@ pydantic>=2.0.0        # Data validation
 python-dotenv>=1.0.0   # Environment variables
 rich>=13.0.0           # Terminal formatting
 tabulate>=0.9.0        # Table formatting
+requests>=2.28.0       # HTTP library
+PyGithub>=1.59.0       # GitHub API wrapper
 
 # Development & Testing
 pytest>=7.0.0
 pytest-cov>=4.0.0
 pytest-asyncio>=0.21.0
 black>=23.0.0          # Code formatter
+ruff>=0.4.0            # Fast Python linter
 flake8>=6.0.0          # Linter
 mypy>=1.0.0            # Type checker
