@@ -350,7 +350,25 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
 - クエリパラメータ:
   - `provider`: `aws | gcp | azure | all`（デフォルト: `all`）
   - `region`: 任意のリージョン/ゾーンフィルタ
+  - `status`: 任意のステータスフィルタ（例: `running`, `stopped`）
+  - `service_type`: 任意のサービスタイプフィルタ（例: `EC2`, `Compute Engine`）
+  - `sort_by`: ソートフィールド - `name | provider | status | created_at | region | service_type`（デフォルト: `name`）
+  - `sort_order`: ソート順 - `asc | desc`（デフォルト: `asc`）
 - レスポンス: `CloudService[]`
+- 使用例:
+  ```bash
+  # ステータスでフィルタ
+  GET /services?status=running
+  
+  # サービスタイプでフィルタ
+  GET /services?service_type=EC2
+  
+  # 作成日時で降順ソート
+  GET /services?sort_by=created_at&sort_order=desc
+  
+  # 組み合わせ: 実行中の EC2 インスタンスを名前順
+  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name
+  ```
 
 #### `GET /services/{provider}/{service_id}`
 - 目的: 指定プロバイダーから特定サービスを取得
@@ -368,8 +386,14 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
 - 検証内容:
   - `/health` の成功応答
   - `/services` の一覧応答
+  - `/services` のステータスフィルタ
+  - `/services` のサービスタイプフィルタ
+  - `/services` のソート機能（昇順/降順）
+  - `/services` のフィルタとソートの組み合わせ
   - `/services/{provider}/{service_id}` の成功応答
   - `/services/{provider}/{service_id}` の 404 応答
+
+**最終更新日**: 2026-03-06
 
 - Missing or invalid credentials
 - Network errors

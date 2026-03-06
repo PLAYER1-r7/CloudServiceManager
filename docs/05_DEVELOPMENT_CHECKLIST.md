@@ -128,9 +128,14 @@
     - `GET /services` - List services with provider/region filtering
     - `GET /services/{provider}/{service_id}` - Get specific service details
   - Added fault-tolerant provider initialization (skips unavailable providers)
-  - Created API test suite (`tests/test_api_main.py`, 4 tests passing)
+  - **Enhanced `/services` endpoint with:**
+    - Status filtering (`?status=running`)
+    - Service type filtering (`?service_type=EC2`)
+    - Flexible sorting (`?sort_by=name&sort_order=desc`)
+    - Support for 6 sort fields: name, provider, status, created_at, region, service_type
+  - Created comprehensive API test suite (`tests/test_api_main.py`, 8 tests passing)
   - Created API startup script (`scripts/start_api.sh`)
-  - Updated README.md with API usage documentation
+  - Updated README.md and API design docs with filtering/sorting examples
   - Dependencies added: fastapi, uvicorn, httpx
   - Interactive API docs available at `/docs` and `/redoc`
   - Version: 1.0.7.0 → 2.0.0-alpha

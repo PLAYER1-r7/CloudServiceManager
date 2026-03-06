@@ -348,7 +348,25 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
 - Query parameters:
   - `provider`: `aws | gcp | azure | all` (default: `all`)
   - `region`: Optional region/zone filter
+  - `status`: Optional status filter (e.g., `running`, `stopped`)
+  - `service_type`: Optional service type filter (e.g., `EC2`, `Compute Engine`)
+  - `sort_by`: Sort field - `name | provider | status | created_at | region | service_type` (default: `name`)
+  - `sort_order`: Sort order - `asc | desc` (default: `asc`)
 - Response: `CloudService[]`
+- Examples:
+  ```bash
+  # Filter by status
+  GET /services?status=running
+  
+  # Filter by service type
+  GET /services?service_type=EC2
+  
+  # Sort by creation date (descending)
+  GET /services?sort_by=created_at&sort_order=desc
+  
+  # Combined: running EC2 instances sorted by name
+  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name
+  ```
 
 #### `GET /services/{provider}/{service_id}`
 - Purpose: Retrieve a specific service from a provider
@@ -366,5 +384,11 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
 - Covered scenarios:
   - `/health` success
   - `/services` list response
+  - `/services` with status filter
+  - `/services` with service_type filter
+  - `/services` with sorting (asc/desc)
+  - `/services` with combined filters and sorting
   - `/services/{provider}/{service_id}` success
   - `/services/{provider}/{service_id}` not found
+
+**Last Updated**: 2026-03-06

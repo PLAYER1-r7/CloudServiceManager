@@ -114,9 +114,14 @@
     - `GET /services` - プロバイダー/リージョンフィルタ付きサービス一覧
     - `GET /services/{provider}/{service_id}` - 特定サービスの詳細取得
   - フォールトトレラントなプロバイダー初期化（利用不可プロバイダーをスキップ）
-  - API テストスイートを作成 (`tests/test_api_main.py`、4テスト通過）
+  - **`/services` エンドポイント拡張:**
+    - ステータスフィルタ (`?status=running`)
+    - サービスタイプフィルタ (`?service_type=EC2`)
+    - 柔軟なソート機能 (`?sort_by=name&sort_order=desc`)
+    - 6種類のソートフィールド対応: name, provider, status, created_at, region, service_type
+  - 包括的な API テストスイートを作成 (`tests/test_api_main.py`、8テスト通過）
   - API 起動スクリプトを作成 (`scripts/start_api.sh`)
-  - README.md に API 利用方法を追記
+  - README.md と API 設計ドキュメントにフィルタ/ソート例を追記
   - 依存関係追加: fastapi, uvicorn, httpx
   - インタラクティブ API ドキュメント (`/docs` と `/redoc`) 利用可能
   - バージョン: 1.0.7.0 → 2.0.0-alpha

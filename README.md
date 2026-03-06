@@ -116,7 +116,27 @@ curl http://localhost:8000/services?provider=aws
 
 # With region filter
 curl http://localhost:8000/services?provider=gcp&region=us-central1-a
+
+# Filter by status
+curl http://localhost:8000/services?status=running
+
+# Filter by service type
+curl http://localhost:8000/services?service_type=EC2
+
+# Sort by creation date (descending)
+curl "http://localhost:8000/services?sort_by=created_at&sort_order=desc"
+
+# Combined filters and sorting
+curl "http://localhost:8000/services?provider=aws&status=running&sort_by=name"
 ```
+
+**Query Parameters:**
+- `provider`: `aws|gcp|azure|all` (default: `all`)
+- `region`: Region/zone filter
+- `status`: Status filter (e.g., `running`, `stopped`)
+- `service_type`: Service type filter (e.g., `EC2`, `Compute Engine`)
+- `sort_by`: Sort field - `name|provider|status|created_at|region|service_type` (default: `name`)
+- `sort_order`: `asc|desc` (default: `asc`)
 
 #### Get Single Service
 ```bash
