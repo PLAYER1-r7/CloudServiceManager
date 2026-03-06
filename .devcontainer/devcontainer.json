@@ -34,6 +34,7 @@
     }
   },
   "postCreateCommand": "pip install -r requirements.txt",
+  "postStartCommand": "gh auth status >/dev/null 2>&1 || echo 'GitHub auth required: gh auth login --web --scopes repo,workflow,gist,read:org,project'",
   "forwardPorts": [
     8000,
     8001

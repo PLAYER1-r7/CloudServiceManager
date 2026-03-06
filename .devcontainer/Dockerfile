@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   ca-certificates \
+  gh \
+  jq \
+  ripgrep \
   && rm -rf /var/lib/apt/lists/*
 
 # Create virtual environment
