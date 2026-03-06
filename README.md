@@ -78,9 +78,16 @@ python -m src.cli.main list-services --format csv
 
 See [03_API_DESIGN.md](docs/03_API_DESIGN.md) for complete CLI documentation.
 
-## Phase 2 Web API (Beta)
+## Phase 2 Web API (Version 2.0.0-beta)
 
-Phase 2 introduces a FastAPI-based web API for programmatic access to cloud services.
+Phase 2 introduces a production-ready FastAPI-based web API with enterprise features:
+
+- **Pagination**: Efficient handling of large result sets
+- **CORS**: Pre-configured for common frontend frameworks
+- **Authentication**: Optional API key authentication
+- **Rate Limiting**: Protection against abuse
+- **Caching**: Improved performance for repeated queries
+- **Interactive Docs**: Swagger UI and ReDoc
 
 ### Start API Server
 
@@ -93,6 +100,22 @@ bash scripts/start_api.sh
 ```
 
 The API will be available at `http://localhost:8000`
+
+### Optional: Enable API Authentication
+
+```bash
+# Set environment variables
+export ENABLE_API_AUTH=true
+export API_KEY=your-secret-key-here
+
+# Start server with authentication enabled
+uvicorn src.api.main:app --reload
+```
+
+Then include the API key in requests:
+```bash
+curl -H "X-API-Key: your-secret-key-here" http://localhost:8000/services
+```
 
 ### API Endpoints
 
@@ -126,8 +149,14 @@ curl http://localhost:8000/services?service_type=EC2
 # Sort by creation date (descending)
 curl "http://localhost:8000/services?sort_by=created_at&sort_order=desc"
 
-# Combined filters and sorting
-curl "http://localhost:8000/services?provider=aws&status=running&sort_by=name"
+# Pagination (first page, 50 items)
+curl "http://localhost:8000/services?limit=50&offset=0"
+
+# Pagination (second page)
+curl "http://localhost:8000/services?limit=50&offset=50"
+
+# Combined filters, sorting, and pagination
+curl "http://localhost:8000/services?provider=aws&status=running&sort_by=name&limit=100"
 ```
 
 **Query Parameters:**
@@ -137,6 +166,19 @@ curl "http://localhost:8000/services?provider=aws&status=running&sort_by=name"
 - `service_type`: Service type filter (e.g., `EC2`, `Compute Engine`)
 - `sort_by`: Sort field - `name|provider|status|created_at|region|service_type` (default: `name`)
 - `sort_order`: `asc|desc` (default: `asc`)
+- `limit`: Maximum results (1-1000, default: 100)
+- `offset`: Skip N results (≥0, default: 0)
+
+**Response Format (Paginated):**
+```json
+{
+  "items": [/* CloudService objects */],
+  "total": 250,
+  "limit": 100,
+  "offset": 0,
+  "has_more": true
+}
+```
 
 #### Get Single Service
 ```bash

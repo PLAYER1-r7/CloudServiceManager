@@ -346,7 +346,7 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
 ```
 
 #### `GET /services`
-- 目的: 単一または全プロバイダーからサービス一覧を取得
+- 目的: 単一または全プロバイダーからサービス一覧をフィルタ、ソート、ページネーション付きで取得
 - クエリパラメータ:
   - `provider`: `aws | gcp | azure | all`（デフォルト: `all`）
   - `region`: 任意のリージョン/ゾーンフィルタ
@@ -354,7 +354,18 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
   - `service_type`: 任意のサービスタイプフィルタ（例: `EC2`, `Compute Engine`）
   - `sort_by`: ソートフィールド - `name | provider | status | created_at | region | service_type`（デフォルト: `name`）
   - `sort_order`: ソート順 - `asc | desc`（デフォルト: `asc`）
-- レスポンス: `CloudService[]`
+  - `limit`: 返す結果の最大数（1-1000、デフォルト: 100）
+  - `offset`: スキップする結果の数（≥0、デフォルト: 0）
+- レスポンス: メタデータ付きのページネーション応答
+  ```json
+  {
+    "items": [/* CloudService オブジェクト */],
+    "total": 250,
+    "limit": 100,
+    "offset": 0,
+    "has_more": true
+  }
+  ```
 - 使用例:
   ```bash
   # ステータスでフィルタ
@@ -366,8 +377,14 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
   # 作成日時で降順ソート
   GET /services?sort_by=created_at&sort_order=desc
   
-  # 組み合わせ: 実行中の EC2 インスタンスを名前順
-  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name
+  # ページネーション: 最初のページ（項目 0-99）
+  GET /services?limit=100&offset=0
+  
+  # ページネーション: 2ページ目（項目 100-199）
+  GET /services?limit=100&offset=100
+  
+  # 組み合わせ: 実行中の EC2 インスタンスを名前順、ページネーション付き
+  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name&limit=50
   ```
 
 #### `GET /services/{provider}/{service_id}`
@@ -385,13 +402,55 @@ Phase 2 として、最小構成の FastAPI バックエンドを開始しまし
 - 追加テスト: `tests/test_api_main.py`
 - 検証内容:
   - `/health` の成功応答
-  - `/services` の一覧応答
+  - `/services` のページネーション付き一覧応答
   - `/services` のステータスフィルタ
   - `/services` のサービスタイプフィルタ
   - `/services` のソート機能（昇順/降順）
   - `/services` のフィルタとソートの組み合わせ
+  - `/services` のlimitによるページネーション
+  - `/services` のoffsetによるページネーション
+  - `/services` のhas_moreフラグ検証
   - `/services/{provider}/{service_id}` の成功応答
   - `/services/{provider}/{service_id}` の 404 応答
+
+### 本番向け機能（Version 2.0.0-beta）
+
+#### CORS設定
+- **目的**: フロントエンドアプリケーションからAPIを呼び出せるようにする
+- **許可されたオリジン**:
+  - `http://localhost:3000` (React デフォルト)
+  - `http://localhost:8080` (Vue デフォルト)
+  - `http://localhost:4200` (Angular デフォルト)
+  - `http://localhost:5173` (Vite デフォルト)
+- **設定**: `src/api/main.py` の `CORSMiddleware` を参照
+
+#### レート制限
+- **実装**: SlowAPI ミドルウェア
+- **制限**:
+  - `GET /health`: 毎分100リクエスト
+  - `GET /services`: 毎分30リクエスト
+  - `GET /services/{provider}/{service_id}`: 毎分60リクエスト
+- **エラー応答**: 制限超過時は `429 Too Many Requests`
+
+#### APIキー認証（オプション）
+- **ヘッダー**: `X-API-Key`
+- **有効化**: 環境変数 `ENABLE_API_AUTH=true` を設定
+- **設定**: 環境変数 `API_KEY` に期待するキーを設定
+- **デフォルト**: 無効（認証不要）
+- **エラー応答**: 有効時に無効/欠落キーの場合は `401 Unauthorized`
+
+#### キャッシング
+- **実装**: キャッシュキー生成用のLRUキャッシュ
+- **目的**: 繰り返しクエリのレスポンス時間を改善
+- **設定**: 最大128個のキャッシュキー
+
+#### OpenAPIドキュメント
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **タグ**: 
+  - `health`: ヘルスチェックエンドポイント
+  - `services`: サービス管理操作
+- **バージョン**: 2.0.0-beta
 
 **最終更新日**: 2026-03-06
 

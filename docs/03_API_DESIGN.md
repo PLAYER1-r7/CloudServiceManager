@@ -344,7 +344,7 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
 ```
 
 #### `GET /services`
-- Purpose: List services from one or all providers
+- Purpose: List services from one or all providers with filtering, sorting, and pagination
 - Query parameters:
   - `provider`: `aws | gcp | azure | all` (default: `all`)
   - `region`: Optional region/zone filter
@@ -352,7 +352,18 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
   - `service_type`: Optional service type filter (e.g., `EC2`, `Compute Engine`)
   - `sort_by`: Sort field - `name | provider | status | created_at | region | service_type` (default: `name`)
   - `sort_order`: Sort order - `asc | desc` (default: `asc`)
-- Response: `CloudService[]`
+  - `limit`: Maximum number of results to return (1-1000, default: 100)
+  - `offset`: Number of results to skip (≥0, default: 0)
+- Response: Paginated response with metadata
+  ```json
+  {
+    "items": [/* CloudService objects */],
+    "total": 250,
+    "limit": 100,
+    "offset": 0,
+    "has_more": true
+  }
+  ```
 - Examples:
   ```bash
   # Filter by status
@@ -364,8 +375,14 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
   # Sort by creation date (descending)
   GET /services?sort_by=created_at&sort_order=desc
   
-  # Combined: running EC2 instances sorted by name
-  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name
+  # Pagination: first page (items 0-99)
+  GET /services?limit=100&offset=0
+  
+  # Pagination: second page (items 100-199)
+  GET /services?limit=100&offset=100
+  
+  # Combined: running EC2 instances sorted by name, paginated
+  GET /services?provider=aws&service_type=EC2&status=running&sort_by=name&limit=50
   ```
 
 #### `GET /services/{provider}/{service_id}`
@@ -383,12 +400,54 @@ Phase 2 has started with a minimal FastAPI backend skeleton.
 - New test file: `tests/test_api_main.py`
 - Covered scenarios:
   - `/health` success
-  - `/services` list response
+  - `/services` list response with pagination
   - `/services` with status filter
   - `/services` with service_type filter
   - `/services` with sorting (asc/desc)
   - `/services` with combined filters and sorting
+  - `/services` pagination with limit
+  - `/services` pagination with offset
+  - `/services` has_more flag validation
   - `/services/{provider}/{service_id}` success
   - `/services/{provider}/{service_id}` not found
+
+### Production Features (Version 2.0.0-beta)
+
+#### CORS Configuration
+- **Purpose**: Enable frontend applications to call the API
+- **Allowed Origins**:
+  - `http://localhost:3000` (React default)
+  - `http://localhost:8080` (Vue default)
+  - `http://localhost:4200` (Angular default)
+  - `http://localhost:5173` (Vite default)
+- **Configuration**: See `CORSMiddleware` in `src/api/main.py`
+
+#### Rate Limiting
+- **Implementation**: SlowAPI middleware
+- **Limits**:
+  - `GET /health`: 100 requests/minute
+  - `GET /services`: 30 requests/minute
+  - `GET /services/{provider}/{service_id}`: 60 requests/minute
+- **Error Response**: `429 Too Many Requests` when limit exceeded
+
+#### API Key Authentication (Optional)
+- **Header**: `X-API-Key`
+- **Enabled**: Set environment variable `ENABLE_API_AUTH=true`
+- **Configuration**: Set `API_KEY` environment variable with expected key
+- **Default**: Disabled (no authentication required)
+- **Error Response**: `401 Unauthorized` for invalid/missing key when enabled
+
+#### Caching
+- **Implementation**: LRU cache for cache key generation
+- **Purpose**: Improve response times for repeated queries
+- **Configuration**: Maximum 128 cached keys
+
+#### OpenAPI Documentation
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **Tags**: 
+  - `health`: Health check endpoints
+  - `services`: Service management operations
+- **Version**: 2.0.0-beta
 
 **Last Updated**: 2026-03-06

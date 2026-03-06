@@ -6,6 +6,7 @@ This document tracks the version releases and associated commit counts.
 
 | Version | Commits | Branch | Date | Notes |
 |---------|---------|--------|------|-------|
+| 2.0.0-beta | N/A | develop | 2026-03-06 | Phase 2: Production features - pagination, CORS, authentication, rate limiting, caching |
 | 2.0.0-alpha.2 | N/A | develop | 2026-03-06 | Phase 2: Add filtering and sorting to /services endpoint |
 | 2.0.0-alpha | N/A | develop | 2026-03-06 | Phase 2 started: FastAPI web API skeleton with core endpoints |
 | 1.0.7.0 | N/A | develop | 2026-03-06 | Issue #4 done: integration tests and CLI output optimization |

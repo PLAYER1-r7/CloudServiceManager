@@ -40,8 +40,12 @@ def test_list_services_endpoint(monkeypatch) -> None:
     response = client.get("/services?provider=aws")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 1
-    assert payload[0]["name"] == "i-api-001"
+    assert payload["total"] == 1
+    assert payload["limit"] == 100
+    assert payload["offset"] == 0
+    assert payload["has_more"] is False
+    assert len(payload["items"]) == 1
+    assert payload["items"][0]["name"] == "i-api-001"
 
 
 def test_get_service_endpoint(monkeypatch) -> None:
@@ -110,9 +114,10 @@ def test_list_services_with_status_filter(monkeypatch) -> None:
     response = client.get("/services?status=running")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 1
-    assert payload[0]["name"] == "i-running"
-    assert payload[0]["status"] == "running"
+    assert payload["total"] == 1
+    assert len(payload["items"]) == 1
+    assert payload["items"][0]["name"] == "i-running"
+    assert payload["items"][0]["status"] == "running"
 
 
 def test_list_services_with_service_type_filter(monkeypatch) -> None:
@@ -147,9 +152,10 @@ def test_list_services_with_service_type_filter(monkeypatch) -> None:
     response = client.get("/services?service_type=EC2")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 1
-    assert payload[0]["name"] == "i-ec2-001"
-    assert payload[0]["service_type"] == "EC2"
+    assert payload["total"] == 1
+    assert len(payload["items"]) == 1
+    assert payload["items"][0]["name"] == "i-ec2-001"
+    assert payload["items"][0]["service_type"] == "EC2"
 
 
 def test_list_services_with_sorting(monkeypatch) -> None:
@@ -194,19 +200,23 @@ def test_list_services_with_sorting(monkeypatch) -> None:
     response = client.get("/services?sort_by=name&sort_order=asc")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 3
-    assert payload[0]["name"] == "a-instance"
-    assert payload[1]["name"] == "m-instance"
-    assert payload[2]["name"] == "z-instance"
+    assert payload["total"] == 3
+    items = payload["items"]
+    assert len(items) == 3
+    assert items[0]["name"] == "a-instance"
+    assert items[1]["name"] == "m-instance"
+    assert items[2]["name"] == "z-instance"
 
     # Test descending order
     response = client.get("/services?sort_by=name&sort_order=desc")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 3
-    assert payload[0]["name"] == "z-instance"
-    assert payload[1]["name"] == "m-instance"
-    assert payload[2]["name"] == "a-instance"
+    assert payload["total"] == 3
+    items = payload["items"]
+    assert len(items) == 3
+    assert items[0]["name"] == "z-instance"
+    assert items[1]["name"] == "m-instance"
+    assert items[2]["name"] == "a-instance"
 
 
 def test_list_services_with_combined_filters_and_sort(monkeypatch) -> None:
@@ -251,7 +261,106 @@ def test_list_services_with_combined_filters_and_sort(monkeypatch) -> None:
     response = client.get("/services?status=running&sort_by=name&sort_order=desc")
     assert response.status_code == 200
     payload = response.json()
-    assert len(payload) == 2
-    assert payload[0]["name"] == "z-running"
-    assert payload[1]["name"] == "a-running"
-    assert all(s["status"] == "running" for s in payload)
+    assert payload["total"] == 2
+    items = payload["items"]
+    assert len(items) == 2
+    assert items[0]["name"] == "z-running"
+    assert items[1]["name"] == "a-running"
+    assert all(s["status"] == "running" for s in items)
+
+
+def test_pagination_limit(monkeypatch) -> None:
+    """Test pagination with limit parameter."""
+    services = [
+        CloudService(
+            provider="aws",
+            service_type="EC2",
+            name=f"instance-{i:03d}",
+            region="us-east-1",
+            status="running",
+            created_at=_now_iso(),
+            metadata={},
+        )
+        for i in range(150)
+    ]
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return services
+
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    # Test with limit=50
+    response = client.get("/services?limit=50")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 150
+    assert payload["limit"] == 50
+    assert payload["offset"] == 0
+    assert payload["has_more"] is True
+    assert len(payload["items"]) == 50
+
+
+def test_pagination_offset(monkeypatch) -> None:
+    """Test pagination with offset parameter."""
+    services = [
+        CloudService(
+            provider="aws",
+            service_type="EC2",
+            name=f"instance-{i:03d}",
+            region="us-east-1",
+            status="running",
+            created_at=_now_iso(),
+            metadata={},
+        )
+        for i in range(150)
+    ]
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return services
+
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    # Test with offset=100
+    response = client.get("/services?limit=50&offset=100")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 150
+    assert payload["limit"] == 50
+    assert payload["offset"] == 100
+    assert payload["has_more"] is False  # 100 + 50 = 150
+    assert len(payload["items"]) == 50
+
+
+def test_pagination_has_more_false(monkeypatch) -> None:
+    """Test has_more flag when there are no more items."""
+    services = [
+        CloudService(
+            provider="aws",
+            service_type="EC2",
+            name=f"instance-{i:03d}",
+            region="us-east-1",
+            status="running",
+            created_at=_now_iso(),
+            metadata={},
+        )
+        for i in range(25)
+    ]
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return services
+
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    # Default limit is 100, but we have only 25 items
+    response = client.get("/services")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 25
+    assert payload["limit"] == 100
+    assert payload["offset"] == 0
+    assert payload["has_more"] is False
+    assert len(payload["items"]) == 25
+
