@@ -426,3 +426,140 @@ def test_auth_enabled_with_valid_api_key_returns_200(monkeypatch) -> None:
     response = client.get("/services", headers={"X-API-Key": "expected-secret"})
     assert response.status_code == 200
 
+
+def test_cache_key_uses_all_components() -> None:
+    """Cache key should normalize optional fields and include sort settings."""
+    key = api_main._cache_key("aws", "", "", "", "name", "asc")
+    assert key == "aws:all:all:all:name:asc"
+
+
+def test_get_providers_safe_all_skips_runtime_errors(monkeypatch) -> None:
+    """Provider init failures should be skipped in ALL mode."""
+
+    class AwsMock:
+        pass
+
+    class GcpMock:
+        def __init__(self):
+            raise RuntimeError("auth failed")
+
+    class AzureMock:
+        pass
+
+    monkeypatch.setattr(api_main, "AWSProvider", AwsMock)
+    monkeypatch.setattr(api_main, "GCPProvider", GcpMock)
+    monkeypatch.setattr(api_main, "AzureProvider", AzureMock)
+
+    providers = api_main._get_providers_safe(api_main.ProviderOption.ALL)
+    assert len(providers) == 2
+    assert isinstance(providers[0], AwsMock)
+    assert isinstance(providers[1], AzureMock)
+
+
+def test_get_providers_safe_single_provider_uses_get_provider(monkeypatch) -> None:
+    """Single-provider path should delegate to _get_provider."""
+    sentinel = object()
+    monkeypatch.setattr(api_main, "_get_provider", lambda provider: sentinel)
+
+    providers = api_main._get_providers_safe(api_main.ProviderOption.AWS)
+    assert providers == [sentinel]
+
+
+def test_list_services_continues_when_one_provider_fails(monkeypatch) -> None:
+    """Best-effort behavior should continue after provider list failure."""
+    service = CloudService(
+        provider="aws",
+        service_type="EC2",
+        name="i-ok",
+        region="us-east-1",
+        status="running",
+        created_at=_now_iso(),
+        metadata={},
+    )
+
+    class FailingProvider:
+        def list_services(self, region=None):
+            raise Exception("provider failed")
+
+    class HealthyProvider:
+        def list_services(self, region=None):
+            return [service]
+
+    monkeypatch.setattr(
+        api_main,
+        "_get_providers_safe",
+        lambda provider: [FailingProvider(), HealthyProvider()],
+    )
+
+    response = client.get("/services")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] == 1
+    assert payload["items"][0]["name"] == "i-ok"
+
+
+def test_list_services_sort_by_all_additional_fields(monkeypatch) -> None:
+    """Cover provider/status/created_at/region/service_type sort branches."""
+    services = [
+        CloudService(
+            provider="gcp",
+            service_type="Compute Engine",
+            name="svc-a",
+            region="us-central1-a",
+            status="RUNNING",
+            created_at="2026-03-06T10:00:00Z",
+            metadata={},
+        ),
+        CloudService(
+            provider="aws",
+            service_type="EC2",
+            name="svc-b",
+            region="us-east-1",
+            status="stopped",
+            created_at="2026-03-06T09:00:00Z",
+            metadata={},
+        ),
+    ]
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return services
+
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    cases = [
+        ("provider", "aws"),
+        ("status", "RUNNING"),
+        ("created_at", "2026-03-06T09:00:00Z"),
+        ("region", "us-central1-a"),
+        ("service_type", "Compute Engine"),
+    ]
+
+    for sort_by, expected_first in cases:
+        response = client.get(f"/services?sort_by={sort_by}&sort_order=asc")
+        assert response.status_code == 200
+        items = response.json()["items"]
+        first = items[0]
+        if sort_by == "provider":
+            assert first["provider"] == expected_first
+        elif sort_by == "status":
+            assert first["status"] == expected_first
+        elif sort_by == "created_at":
+            assert first["created_at"] == expected_first
+        elif sort_by == "region":
+            assert first["region"] == expected_first
+        elif sort_by == "service_type":
+            assert first["service_type"] == expected_first
+
+
+def test_get_service_invalid_provider_returns_400(monkeypatch) -> None:
+    """Invalid provider errors should map to HTTP 400."""
+
+    def _raise_value_error(provider):
+        raise ValueError("Unsupported provider")
+
+    monkeypatch.setattr(api_main, "_get_provider", _raise_value_error)
+    response = client.get("/services/invalid/svc-1")
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Unsupported provider"
+
