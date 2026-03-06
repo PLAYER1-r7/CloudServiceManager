@@ -194,6 +194,40 @@ FastAPI provides automatic interactive API documentation:
 
 See [docs/03_API_DESIGN.md](docs/03_API_DESIGN.md) for complete API documentation.
 
+### Manual API Testing
+
+Two smoke test scripts are provided for manual verification:
+
+**Quick Smoke Test** (recommended for quick checks):
+```bash
+./scripts/test_api_quick.sh
+```
+
+**Comprehensive Smoke Test** (full endpoint coverage):
+```bash
+./scripts/test_api_smoke.sh
+```
+
+Both scripts test:
+- Health endpoint
+- Service listing with pagination
+- Filtering (status, service_type)
+- Sorting (name, created_at, etc.)
+- Error handling (invalid parameters)
+- OpenAPI specification
+
+**Custom base URL:**
+```bash
+./scripts/test_api_quick.sh http://your-server:8000
+```
+
+**With API authentication:**
+```bash
+./scripts/test_api_smoke.sh http://localhost:8000 your-api-key
+```
+
+**Note**: Provider authentication logs are expected if cloud credentials are not configured. Tests verify HTTP status codes regardless of data availability.
+
 ## Development Workflow
 
 ### ⚠️ GitHub Project Status Management (MANDATORY)
