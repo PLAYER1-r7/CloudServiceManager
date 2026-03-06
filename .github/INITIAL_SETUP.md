@@ -34,6 +34,9 @@ Priority: **CRITICAL** - Apply this rule before operational work
 - [ ] Use alternatives only when installation is blocked by permissions/network/policy
 - [ ] If an alternative is used, record the blocker and reason in the related issue/PR comment
 - [ ] Revisit and install the missing software as soon as the blocker is removed
+- [ ] After software installation, reflect required changes in `.devcontainer/` (Dockerfile, `devcontainer.json`, post-create scripts, package lists)
+- [ ] If authentication is required for tools/services, explicitly request authentication before proceeding (for example: `gh auth login`, cloud CLI login)
+- [ ] Do not continue privileged operations while unauthenticated; request auth first and resume after verification
 
 ## Step 2: Create Milestones
 
