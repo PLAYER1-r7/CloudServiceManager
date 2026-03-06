@@ -1,8 +1,9 @@
 """Tests for GCP authentication."""
 
 import os
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 from google.auth.exceptions import DefaultCredentialsError
 
 from src.cli.auth.gcp_auth import GCPAuth
@@ -27,6 +28,16 @@ class TestGCPAuth:
         with patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT': 'my-project'}):
             auth = GCPAuth()
             assert auth.project_id == 'my-project'
+
+    @patch('src.cli.auth.gcp_auth.default')
+    def test_initialization_with_gcloud_project_env(self, mock_auth_default):
+        """Test initialization with GCLOUD_PROJECT environment variable."""
+        mock_credentials = Mock()
+        mock_auth_default.return_value = (mock_credentials, None)
+
+        with patch.dict(os.environ, {'GCLOUD_PROJECT': 'gcloud-project'}):
+            auth = GCPAuth()
+            assert auth.project_id == 'gcloud-project'
     
     @patch('src.cli.auth.gcp_auth.default')
     def test_initialization_with_parameter(self, mock_auth_default):
@@ -231,3 +242,26 @@ class TestGCPAuth:
             auth = GCPAuth()
             # Should use project from google.auth.default
             assert auth.project_id in ['credential-project', 'default-project', None]
+
+    @patch('src.cli.auth.gcp_auth.default')
+    def test_set_project_success(self, mock_auth_default):
+        """Test set_project updates project id with non-empty value."""
+        mock_auth_default.return_value = (Mock(), 'initial-project')
+
+        auth = GCPAuth()
+        result = auth.set_project('new-project')
+
+        assert result is True
+        assert auth.project_id == 'new-project'
+
+    @patch('src.cli.auth.gcp_auth.default')
+    def test_set_project_failure_empty(self, mock_auth_default):
+        """Test set_project rejects empty/blank values."""
+        mock_auth_default.return_value = (Mock(), 'initial-project')
+
+        auth = GCPAuth()
+        original_project = auth.project_id
+
+        assert auth.set_project('') is False
+        assert auth.set_project('   ') is False
+        assert auth.project_id == original_project

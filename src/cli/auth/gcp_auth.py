@@ -5,8 +5,8 @@ from typing import Any, Dict, Optional
 
 from google.auth import default
 from google.auth.exceptions import DefaultCredentialsError
-from google.oauth2 import service_account
 from google.cloud import compute_v1
+from google.oauth2 import service_account
 
 from .base import CloudAuthBase
 
@@ -37,7 +37,12 @@ class GCPAuth(CloudAuthBase):
             credentials_file: Path to service account JSON file
         """
         super().__init__()
-        self._project_id = project_id or os.getenv("GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT")
+        self._project_id = (
+            project_id
+            or os.getenv("GCP_PROJECT")
+            or os.getenv("GCLOUD_PROJECT")
+            or os.getenv("GOOGLE_CLOUD_PROJECT")
+        )
         self._credentials_file = credentials_file or os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
         self._credentials = None
         self._auth_method: Optional[str] = None
@@ -183,3 +188,21 @@ class GCPAuth(CloudAuthBase):
             Optional[str]: The project ID if available
         """
         return self._project_id
+
+    def set_project(self, project_id: str) -> bool:
+        """Switch the active GCP project.
+
+        This method only updates the target project ID for future API calls.
+
+        Args:
+            project_id: New GCP project ID
+
+        Returns:
+            bool: True when a non-empty project ID was applied, False otherwise
+        """
+        normalized = (project_id or "").strip()
+        if not normalized:
+            return False
+
+        self._project_id = normalized
+        return True
