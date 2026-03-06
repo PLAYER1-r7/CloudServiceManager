@@ -10,7 +10,6 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from .models.service import CloudProvider
 from .providers.aws import AWSProvider
 from .providers.azure import AzureProvider
 from .providers.gcp import GCPProvider

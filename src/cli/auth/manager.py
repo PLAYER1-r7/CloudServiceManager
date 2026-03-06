@@ -1,6 +1,6 @@
 """Cloud authentication manager for multi-cloud support."""
 
-from typing import Dict, Optional, Type, Union
+from typing import Dict, Type
 
 from .base import CloudAuthBase
 from .aws_auth import AWSAuth

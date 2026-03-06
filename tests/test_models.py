@@ -11,7 +11,6 @@ Tests CloudService and CloudProvider models including:
 
 import json
 import pytest
-from datetime import datetime
 from pydantic import ValidationError
 
 from src.cli.models.service import CloudService, CloudProvider

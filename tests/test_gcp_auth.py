@@ -1,7 +1,7 @@
 """Tests for GCP authentication."""
 
 import os
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from google.auth.exceptions import DefaultCredentialsError

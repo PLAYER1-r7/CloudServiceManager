@@ -2,7 +2,7 @@
 
 import os
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from azure.core.exceptions import ClientAuthenticationError
 
 from src.cli.auth.azure_auth import AzureAuth

@@ -1,13 +1,10 @@
 """Tests for CloudAuthManager."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 from src.cli.auth.manager import CloudAuthManager
 from src.cli.auth.base import CloudAuthBase
-from src.cli.auth.aws_auth import AWSAuth
-from src.cli.auth.gcp_auth import GCPAuth
-from src.cli.auth.azure_auth import AzureAuth
 
 
 class TestCloudAuthManager:
@@ -288,8 +285,8 @@ class TestCloudAuthManager:
         manager = CloudAuthManager()
         
         # Initialize providers
-        aws_auth = manager.get_auth('aws', region='us-west-2')
-        gcp_auth = manager.get_auth('gcp', project_id='my-project')
+        manager.get_auth('aws', region='us-west-2')
+        manager.get_auth('gcp', project_id='my-project')
         
         # Get authentication status (may be False initially, that's OK)
         auth_status = manager.get_all_authenticated()

@@ -4,7 +4,6 @@ import logging
 from datetime import datetime
 from typing import List, Optional
 
-import boto3
 from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
 
 from ..auth.aws_auth import AWSAuth

@@ -15,7 +15,6 @@ from datetime import datetime
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from src.cli.auth.aws_auth import AWSAuth
-from src.cli.models.service import CloudService, CloudProvider
 from src.cli.providers.aws import AWSProvider
 
 
