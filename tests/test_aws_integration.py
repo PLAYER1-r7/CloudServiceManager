@@ -34,12 +34,12 @@ class _EC2InstanceDict(TypedDict):
 
 class TestAWSCloudServiceIntegration:
     """Integration tests between AWS provider and CloudService model."""
-    
+
     @pytest.fixture
     def mock_ec2_client(self) -> MagicMock:
         """Fixture providing a mock EC2 client."""
         return MagicMock()
-    
+
     @pytest.fixture
     def aws_provider(self, mock_ec2_client: MagicMock) -> AWSProvider:
         """Fixture providing AWSProvider with mocked EC2 client."""
@@ -53,7 +53,7 @@ class TestAWSCloudServiceIntegration:
 
         provider = AWSProvider(auth=mock_auth)
         return provider
-    
+
     def test_ec2_response_to_cloud_service_conversion(self):
         """Test converting AWS EC2 response to CloudService model."""
         # Simulated AWS EC2 instance response
@@ -63,9 +63,9 @@ class TestAWSCloudServiceIntegration:
             "State": {"Name": "running"},
             "LaunchTime": datetime(2024, 1, 15, 10, 30, 0),
             "ImageId": "ami-0123456789abcdef0",
-            "Placement": {"AvailabilityZone": "us-east-1a"}
+            "Placement": {"AvailabilityZone": "us-east-1a"},
         }
-        
+
         # Convert to CloudService
         service = CloudService(
             provider="aws",
@@ -77,17 +77,17 @@ class TestAWSCloudServiceIntegration:
             metadata={
                 "instance_type": ec2_instance["InstanceType"],
                 "image_id": ec2_instance["ImageId"],
-                "availability_zone": ec2_instance["Placement"]["AvailabilityZone"]
-            }
+                "availability_zone": ec2_instance["Placement"]["AvailabilityZone"],
+            },
         )
-        
+
         # Verify conversion
         assert service.provider == "aws"
         assert service.service_type == "EC2"
         assert service.name == "i-0123456789abcdef0"
         assert service.status == "running"
         assert service.metadata["instance_type"] == "t2.micro"
-    
+
     def test_multiple_aws_instances_conversion(self):
         """Test converting multiple AWS EC2 instances to CloudService models."""
         ec2_instances: list[_EC2InstanceDict] = [
@@ -96,17 +96,17 @@ class TestAWSCloudServiceIntegration:
                 "InstanceType": "t2.micro",
                 "State": {"Name": "running"},
                 "LaunchTime": datetime(2024, 1, 15, 10, 30, 0),
-                "ImageId": "ami-0123456789abcdef0"
+                "ImageId": "ami-0123456789abcdef0",
             },
             {
                 "InstanceId": "i-0123456789abcdef1",
                 "InstanceType": "t2.small",
                 "State": {"Name": "stopped"},
                 "LaunchTime": datetime(2024, 1, 14, 8, 20, 0),
-                "ImageId": "ami-0123456789abcdef1"
-            }
+                "ImageId": "ami-0123456789abcdef1",
+            },
         ]
-        
+
         services: list[CloudService] = []
         for instance in ec2_instances:
             service = CloudService(
@@ -118,18 +118,18 @@ class TestAWSCloudServiceIntegration:
                 created_at=instance["LaunchTime"].isoformat() + "Z",
                 metadata={
                     "instance_type": instance["InstanceType"],
-                    "image_id": instance["ImageId"]
-                }
+                    "image_id": instance["ImageId"],
+                },
             )
             services.append(service)
-        
+
         # Verify conversion of multiple instances
         assert len(services) == 2
         assert services[0].name == "i-0123456789abcdef0"
         assert services[0].status == "running"
         assert services[1].name == "i-0123456789abcdef1"
         assert services[1].status == "stopped"
-    
+
     def test_aws_service_serialization_for_cli_output(self):
         """Test that CloudService can be serialized for CLI output."""
         service = CloudService(
@@ -139,19 +139,19 @@ class TestAWSCloudServiceIntegration:
             region="us-east-1",
             status="running",
             created_at="2024-01-15T10:30:00Z",
-            metadata={"instance_type": "t2.micro", "image_id": "ami-0123456789abcdef0"}
+            metadata={"instance_type": "t2.micro", "image_id": "ami-0123456789abcdef0"},
         )
-        
+
         # Test JSON output (for --format json)
         json_output = service.to_json()
         assert "i-0123456789abcdef0" in json_output
         assert "t2.micro" in json_output
-        
+
         # Test CSV output
         csv_dict = service.to_csv_dict()
         assert csv_dict["provider"] == "aws"
         assert csv_dict["name"] == "i-0123456789abcdef0"
-    
+
     def test_aws_provider_list_services_mock(
         self, aws_provider: AWSProvider, mock_ec2_client: MagicMock
     ):
@@ -166,25 +166,27 @@ class TestAWSCloudServiceIntegration:
                             "InstanceType": "t2.micro",
                             "State": {"Name": "running"},
                             "LaunchTime": datetime(2024, 1, 15, 10, 30, 0),
-                            "ImageId": "ami-0123456789abcdef0"
+                            "ImageId": "ami-0123456789abcdef0",
                         }
                     ]
                 }
             ]
         }
-        
+
         mock_ec2_client.describe_instances.return_value = mock_response
-        mock_ec2_client.describe_regions.return_value = {"Regions": [{"RegionName": "us-east-1"}]}
-        
+        mock_ec2_client.describe_regions.return_value = {
+            "Regions": [{"RegionName": "us-east-1"}]
+        }
+
         # Call list_services
         services = aws_provider.list_services(region="us-east-1")
-        
+
         # Verify results
         assert len(services) == 1
         assert services[0].provider == "aws"
         assert services[0].name == "i-0123456789abcdef0"
         assert services[0].status == "running"
-    
+
     def test_aws_provider_get_service_mock(
         self, aws_provider: AWSProvider, mock_ec2_client: MagicMock
     ):
@@ -200,24 +202,24 @@ class TestAWSCloudServiceIntegration:
                             "State": {"Name": "running"},
                             "LaunchTime": datetime(2024, 1, 15, 10, 30, 0),
                             "ImageId": "ami-0123456789abcdef0",
-                            "Placement": {"AvailabilityZone": "us-east-1a"}
+                            "Placement": {"AvailabilityZone": "us-east-1a"},
                         }
                     ]
                 }
             ]
         }
-        
+
         mock_ec2_client.describe_instances.return_value = mock_response
-        
+
         # Call get_service with explicit region to avoid scanning all regions
         service = aws_provider.get_service("i-0123456789abcdef0", region="us-east-1")
-        
+
         # Verify results
         assert service is not None
         assert service.provider == "aws"
         assert service.name == "i-0123456789abcdef0"
         assert service.service_type == "EC2"
-    
+
     def test_cloud_service_consistency_across_providers(self):
         """Test that CloudService can represent resources from different providers consistently."""
         # AWS EC2 Instance
@@ -228,9 +230,9 @@ class TestAWSCloudServiceIntegration:
             region="us-east-1",
             status="running",
             created_at="2024-01-15T10:30:00Z",
-            metadata={"instance_type": "t2.micro"}
+            metadata={"instance_type": "t2.micro"},
         )
-        
+
         # GCP Compute Engine Instance
         gcp_service = CloudService(
             provider="gcp",
@@ -239,9 +241,9 @@ class TestAWSCloudServiceIntegration:
             region="us-central1-a",
             status="RUNNING",
             created_at="2024-01-14T08:20:00Z",
-            metadata={"machine_type": "n1-standard-1"}
+            metadata={"machine_type": "n1-standard-1"},
         )
-        
+
         # Azure Virtual Machine
         azure_service = CloudService(
             provider="azure",
@@ -250,20 +252,30 @@ class TestAWSCloudServiceIntegration:
             region="eastus",
             status="running",
             created_at="2024-01-16T14:45:00Z",
-            metadata={"size": "Standard_B1s"}
+            metadata={"size": "Standard_B1s"},
         )
-        
+
         # All should be serializable consistently
         services = [aws_service, gcp_service, azure_service]
         for service in services:
             # to_dict
             dict_data = service.to_dict()
-            assert all(k in dict_data for k in ["provider", "service_type", "name", "region", "status", "created_at"])
-            
+            assert all(
+                k in dict_data
+                for k in [
+                    "provider",
+                    "service_type",
+                    "name",
+                    "region",
+                    "status",
+                    "created_at",
+                ]
+            )
+
             # to_json
             json_str = service.to_json()
             assert isinstance(json_str, str)
-            
+
             # roundtrip
             restored = CloudService.from_json(json_str)
             assert restored.provider == service.provider

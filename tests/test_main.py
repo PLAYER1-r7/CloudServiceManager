@@ -33,10 +33,7 @@ def test_init_config_command():
 @pytest.mark.unit
 def test_invalid_provider():
     """Test that invalid provider returns error."""
-    result = runner.invoke(
-        app,
-        ["list-services", "--provider", "invalid"]
-    )
+    result = runner.invoke(app, ["list-services", "--provider", "invalid"])
     assert result.exit_code != 0
 
 
@@ -58,9 +55,13 @@ def test_list_services_with_json_output(monkeypatch):
         def list_services(self, region=None):
             return [service]
 
-    monkeypatch.setattr(main_module, "_get_providers", lambda provider: [MockProvider()])
+    monkeypatch.setattr(
+        main_module, "_get_providers", lambda provider: [MockProvider()]
+    )
 
-    result = runner.invoke(app, ["list-services", "--provider", "aws", "--format", "json"])
+    result = runner.invoke(
+        app, ["list-services", "--provider", "aws", "--format", "json"]
+    )
 
     assert result.exit_code == 0
     assert "i-123456" in result.stdout
@@ -85,12 +86,18 @@ def test_list_services_csv_output(monkeypatch):
         def list_services(self, region=None):
             return [service]
 
-    monkeypatch.setattr(main_module, "_get_providers", lambda provider: [MockProvider()])
+    monkeypatch.setattr(
+        main_module, "_get_providers", lambda provider: [MockProvider()]
+    )
 
-    result = runner.invoke(app, ["list-services", "--provider", "gcp", "--format", "csv"])
+    result = runner.invoke(
+        app, ["list-services", "--provider", "gcp", "--format", "csv"]
+    )
 
     assert result.exit_code == 0
-    assert "provider,service_type,name,region,status,created_at,metadata" in result.stdout
+    assert (
+        "provider,service_type,name,region,status,created_at,metadata" in result.stdout
+    )
     assert "instance-1" in result.stdout
     assert "machine_type" in result.stdout
     assert "n1-standard-1" in result.stdout
@@ -124,7 +131,9 @@ def test_list_services_partial_provider_failure(monkeypatch):
         lambda provider: [FailingProvider(), WorkingProvider()],
     )
 
-    result = runner.invoke(app, ["list-services", "--provider", "all", "--format", "table"])
+    result = runner.invoke(
+        app, ["list-services", "--provider", "all", "--format", "table"]
+    )
 
     assert result.exit_code == 0
     assert "Warning" in result.stdout
@@ -139,7 +148,9 @@ def test_list_services_all_providers_fail(monkeypatch):
         def list_services(self, region=None):
             raise RuntimeError("auth failed")
 
-    monkeypatch.setattr(main_module, "_get_providers", lambda provider: [FailingProvider()])
+    monkeypatch.setattr(
+        main_module, "_get_providers", lambda provider: [FailingProvider()]
+    )
 
     result = runner.invoke(app, ["list-services", "--provider", "all"])
 

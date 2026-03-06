@@ -35,7 +35,9 @@ def test_list_services_endpoint(monkeypatch) -> None:
         def list_services(self, region=None):
             return [service]
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services?provider=aws")
     assert response.status_code == 200
@@ -109,7 +111,9 @@ def test_list_services_with_status_filter(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services?status=running")
     assert response.status_code == 200
@@ -147,7 +151,9 @@ def test_list_services_with_service_type_filter(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services?service_type=EC2")
     assert response.status_code == 200
@@ -194,7 +200,9 @@ def test_list_services_with_sorting(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     # Test ascending order (default)
     response = client.get("/services?sort_by=name&sort_order=asc")
@@ -255,7 +263,9 @@ def test_list_services_with_combined_filters_and_sort(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     # Filter by status=running and sort by name desc
     response = client.get("/services?status=running&sort_by=name&sort_order=desc")
@@ -288,7 +298,9 @@ def test_pagination_limit(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     # Test with limit=50
     response = client.get("/services?limit=50")
@@ -320,7 +332,9 @@ def test_pagination_offset(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     # Test with offset=100
     response = client.get("/services?limit=50&offset=100")
@@ -352,7 +366,9 @@ def test_pagination_has_more_false(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     # Default limit is 100, but we have only 25 items
     response = client.get("/services")
@@ -374,7 +390,9 @@ def test_auth_disabled_allows_request_without_api_key(monkeypatch) -> None:
 
     monkeypatch.delenv("ENABLE_API_AUTH", raising=False)
     monkeypatch.delenv("API_KEY", raising=False)
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services")
     assert response.status_code == 200
@@ -389,7 +407,9 @@ def test_auth_enabled_without_configured_api_key_returns_500(monkeypatch) -> Non
 
     monkeypatch.setenv("ENABLE_API_AUTH", "true")
     monkeypatch.delenv("API_KEY", raising=False)
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services")
     assert response.status_code == 500
@@ -405,7 +425,9 @@ def test_auth_enabled_with_invalid_api_key_returns_401(monkeypatch) -> None:
 
     monkeypatch.setenv("ENABLE_API_AUTH", "true")
     monkeypatch.setenv("API_KEY", "expected-secret")
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services", headers={"X-API-Key": "wrong-secret"})
     assert response.status_code == 401
@@ -421,7 +443,9 @@ def test_auth_enabled_with_valid_api_key_returns_200(monkeypatch) -> None:
 
     monkeypatch.setenv("ENABLE_API_AUTH", "true")
     monkeypatch.setenv("API_KEY", "expected-secret")
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     response = client.get("/services", headers={"X-API-Key": "expected-secret"})
     assert response.status_code == 200
@@ -525,7 +549,9 @@ def test_list_services_sort_by_all_additional_fields(monkeypatch) -> None:
         def list_services(self, region=None):
             return services
 
-    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+    monkeypatch.setattr(
+        api_main, "_get_providers_safe", lambda provider: [ProviderMock()]
+    )
 
     cases = [
         ("provider", "aws"),
@@ -562,4 +588,3 @@ def test_get_service_invalid_provider_returns_400(monkeypatch) -> None:
     response = client.get("/services/invalid/svc-1")
     assert response.status_code == 400
     assert response.json()["detail"] == "Unsupported provider"
-

@@ -13,10 +13,10 @@ class BaseProvider(ABC):
     def list_services(self, region: Optional[str] = None) -> List[CloudService]:
         """
         List all services from this provider.
-        
+
         Args:
             region: Optional region filter
-            
+
         Returns:
             List of CloudService objects
         """
@@ -26,10 +26,10 @@ class BaseProvider(ABC):
     def get_service(self, service_id: str) -> Optional[CloudService]:
         """
         Get a specific service by ID.
-        
+
         Args:
             service_id: Service identifier
-            
+
         Returns:
             CloudService object or None if not found
         """
