@@ -25,6 +25,16 @@ Required labels:
 - [ ] `in-progress` (Purple #6f42c1) - Currently being worked on
 - [ ] `needs-review` (Cyan #1f97c6) - Awaiting review/feedback
 
+## Tooling Policy (Mandatory)
+
+Priority: **CRITICAL** - Apply this rule before operational work
+
+- [ ] If required software is missing, install it first (for example: `gh`, `jq`, `rg`)
+- [ ] Avoid fallback workflows when installation is possible
+- [ ] Use alternatives only when installation is blocked by permissions/network/policy
+- [ ] If an alternative is used, record the blocker and reason in the related issue/PR comment
+- [ ] Revisit and install the missing software as soon as the blocker is removed
+
 ## Step 2: Create Milestones
 
 Priority: **HIGH** - Essential for release planning
@@ -221,5 +231,5 @@ Once setup is complete:
 
 ---
 
-**Last Updated**: 2026-03-05  
+**Last Updated**: 2026-03-06  
 **Status**: Ready for implementation
