@@ -105,3 +105,40 @@ jobs:
         if [[ ! "$PR_BODY" =~ (#[0-9]+|Closes|Fixes|Relates) ]]; then
           echo "⚠️  Warning: PR should reference related issues with 'Closes #123' or 'Relates to #456'"
         fi
+
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install security scanning tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit[toml] safety
+
+    - name: Run Bandit security scanner
+      run: |
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ --severity-level medium || true
+
+    - name: Check dependency vulnerabilities with Safety
+      run: |
+        safety scan --json --output safety-report.json || true
+        safety scan || true
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+        retention-days: 30
