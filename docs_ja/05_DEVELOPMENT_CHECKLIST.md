@@ -107,24 +107,32 @@
   - フルテスト結果: 172 passed, 1 skipped
   - バージョン: 1.0.6.0 → 1.0.7.0
 
-- **Phase 2**: Web API スケルトン (進行中)
+- **Phase 2**: 本番対応 Web API (完了 - Version 2.0.0-beta)
   - FastAPI アプリケーションスケルトンを作成 (`src/api/main.py`)
   - コアエンドポイントを実装:
-    - `GET /health` - ヘルスチェックエンドポイント
-    - `GET /services` - プロバイダー/リージョンフィルタ付きサービス一覧
-    - `GET /services/{provider}/{service_id}` - 特定サービスの詳細取得
+    - `GET /health` - ヘルスチェックエンドポイント（レート制限: 100/分）
+    - `GET /services` - 包括的な機能を持つサービス一覧
+    - `GET /services/{provider}/{service_id}` - 特定サービスの詳細取得（レート制限: 60/分）
   - フォールトトレラントなプロバイダー初期化（利用不可プロバイダーをスキップ）
   - **`/services` エンドポイント拡張:**
     - ステータスフィルタ (`?status=running`)
     - サービスタイプフィルタ (`?service_type=EC2`)
     - 柔軟なソート機能 (`?sort_by=name&sort_order=desc`)
     - 6種類のソートフィールド対応: name, provider, status, created_at, region, service_type
-  - 包括的な API テストスイートを作成 (`tests/test_api_main.py`、8テスト通過）
+    - **ページネーション** (`?limit=100&offset=0`) - レスポンスに含まれる: items, total, limit, offset, has_more
+  - **本番向け機能:**
+    - **CORS**: React, Vue, Angular, Vite 開発サーバー用に事前設定済み
+    - **APIキー認証**: オプション（`X-API-Key` ヘッダー経由、`ENABLE_API_AUTH` 環境変数で制御）
+    - **レート制限**: SlowAPI ミドルウェア（毎分 100/30/60 リクエスト）
+    - **キャッシング**: クエリパフォーマンス向上のための LRU キャッシュ（最大 128 キー）
+    - **OpenAPI**: タグ、メタデータ付き強化版、version 2.0.0-beta
+  - 包括的な API テストスイートを作成 (`tests/test_api_main.py`、11テスト通過）
   - API 起動スクリプトを作成 (`scripts/start_api.sh`)
-  - README.md と API 設計ドキュメントにフィルタ/ソート例を追記
-  - 依存関係追加: fastapi, uvicorn, httpx
+  - README.md と API 設計ドキュメントにすべての機能を記載
+  - 依存関係追加: fastapi, uvicorn, httpx, slowapi, python-multipart
   - インタラクティブ API ドキュメント (`/docs` と `/redoc`) 利用可能
-  - バージョン: 1.0.7.0 → 2.0.0-alpha
+  - 全テスト成功: 183 passed, 1 skipped
+  - バージョン: 1.0.7.0 → 2.0.0-alpha → 2.0.0-alpha.2 → 2.0.0-beta
 
 #### 🚧 実装中
 なし（Phase 1 対象はすべて完了）

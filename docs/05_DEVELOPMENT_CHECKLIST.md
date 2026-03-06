@@ -121,24 +121,32 @@
   - CLI unit + integration coverage for `src/cli/main.py` reached 85%
   - Version: 1.0.6.0 → 1.0.7.0
 
-- **Phase 2**: Web API Skeleton (IN PROGRESS)
+- **Phase 2**: Production-Ready Web API (DONE - Version 2.0.0-beta)
   - Created FastAPI application skeleton (`src/api/main.py`)
   - Implemented core endpoints:
-    - `GET /health` - Health check endpoint
-    - `GET /services` - List services with provider/region filtering
-    - `GET /services/{provider}/{service_id}` - Get specific service details
+    - `GET /health` - Health check endpoint (rate limited: 100/min)
+    - `GET /services` - List services with comprehensive features
+    - `GET /services/{provider}/{service_id}` - Get specific service details (rate limited: 60/min)
   - Added fault-tolerant provider initialization (skips unavailable providers)
   - **Enhanced `/services` endpoint with:**
     - Status filtering (`?status=running`)
     - Service type filtering (`?service_type=EC2`)
     - Flexible sorting (`?sort_by=name&sort_order=desc`)
     - Support for 6 sort fields: name, provider, status, created_at, region, service_type
-  - Created comprehensive API test suite (`tests/test_api_main.py`, 8 tests passing)
+    - **Pagination** (`?limit=100&offset=0`) - Response includes: items, total, limit, offset, has_more
+  - **Production Features:**
+    - **CORS**: Pre-configured for React, Vue, Angular, Vite development servers
+    - **API Key Authentication**: Optional (via `X-API-Key` header, controlled by `ENABLE_API_AUTH` env var)
+    - **Rate Limiting**: SlowAPI middleware (100/30/60 requests per minute)
+    - **Caching**: LRU cache for improved query performance (max 128 keys)
+    - **OpenAPI**: Enhanced with tags, metadata, version 2.0.0-beta
+  - Created comprehensive API test suite (`tests/test_api_main.py`, 11 tests passing)
   - Created API startup script (`scripts/start_api.sh`)
-  - Updated README.md and API design docs with filtering/sorting examples
-  - Dependencies added: fastapi, uvicorn, httpx
+  - Updated README.md and API design docs with all features
+  - Dependencies added: fastapi, uvicorn, httpx, slowapi, python-multipart
   - Interactive API docs available at `/docs` and `/redoc`
-  - Version: 1.0.7.0 → 2.0.0-alpha
+  - All tests passing: 183 passed, 1 skipped
+  - Version: 1.0.7.0 → 2.0.0-alpha → 2.0.0-alpha.2 → 2.0.0-beta
 
 #### 🚧 In Progress
 None currently idle
