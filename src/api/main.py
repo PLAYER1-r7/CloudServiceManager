@@ -63,37 +63,38 @@ API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 
-async def get_api_key(api_key: Optional[str] = Security(api_key_header)) -> Optional[str]:
+async def get_api_key(
+    api_key: Optional[str] = Security(api_key_header),
+) -> Optional[str]:
     """
     Validate API key if authentication is enabled.
-    
+
     For production use, set ENABLE_API_AUTH=true and API_KEY environment variable.
     """
     import os
-    
+
     if os.getenv("ENABLE_API_AUTH", "false").lower() == "true":
         expected_key = os.getenv("API_KEY")
         if not expected_key:
             raise HTTPException(
                 status_code=500,
-                detail="API authentication is enabled but API_KEY is not configured"
+                detail="API authentication is enabled but API_KEY is not configured",
             )
         if api_key != expected_key:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid or missing API key"
-            )
+            raise HTTPException(status_code=401, detail="Invalid or missing API key")
     return api_key
 
 
 class SortOrder(str, Enum):
     """Sort order options."""
+
     ASC = "asc"
     DESC = "desc"
 
 
 class SortBy(str, Enum):
     """Sort field options."""
+
     NAME = "name"
     PROVIDER = "provider"
     STATUS = "status"
@@ -104,7 +105,7 @@ class SortBy(str, Enum):
 
 def _get_providers_safe(provider: ProviderOption = ProviderOption.ALL) -> list:
     """Get provider instances, skipping those with authentication failures.
-    
+
     Unlike CLI's _get_providers, this version is fault-tolerant and returns
     only successfully initialized providers instead of failing fast.
     """
@@ -116,7 +117,7 @@ def _get_providers_safe(provider: ProviderOption = ProviderOption.ALL) -> list:
             except RuntimeError as e:
                 logger.warning(f"Skipping {prov_class.__name__}: {e}")
         return providers
-    
+
     # For single provider, use the existing _get_provider which raises on failure
     return [_get_provider(provider.value)]
 
@@ -130,11 +131,19 @@ def health(request: Request) -> dict[str, str]:
 
 class PaginatedResponse(dict):
     """Paginated response wrapper."""
+
     pass
 
 
 @lru_cache(maxsize=128)
-def _cache_key(provider: str, region: str, status: str, service_type: str, sort_by: str, sort_order: str) -> str:
+def _cache_key(
+    provider: str,
+    region: str,
+    status: str,
+    service_type: str,
+    sort_by: str,
+    sort_order: str,
+) -> str:
     """Generate cache key for service listing."""
     return f"{provider}:{region or 'all'}:{status or 'all'}:{service_type or 'all'}:{sort_by}:{sort_order}"
 
@@ -143,26 +152,36 @@ def _cache_key(provider: str, region: str, status: str, service_type: str, sort_
 @limiter.limit("30/minute")
 def list_services(
     request: Request,
-    provider: ProviderOption = Query(ProviderOption.ALL, description="aws|gcp|azure|all"),
-    region: Optional[str] = Query(None, description="Provider-specific region/zone filter"),
-    status: Optional[str] = Query(None, description="Filter by service status (e.g., 'running')"),
-    service_type: Optional[str] = Query(None, description="Filter by service type (e.g., 'EC2', 'Compute Engine')"),
+    provider: ProviderOption = Query(
+        ProviderOption.ALL, description="aws|gcp|azure|all"
+    ),
+    region: Optional[str] = Query(
+        None, description="Provider-specific region/zone filter"
+    ),
+    status: Optional[str] = Query(
+        None, description="Filter by service status (e.g., 'running')"
+    ),
+    service_type: Optional[str] = Query(
+        None, description="Filter by service type (e.g., 'EC2', 'Compute Engine')"
+    ),
     sort_by: SortBy = Query(SortBy.NAME, description="Field to sort by"),
     sort_order: SortOrder = Query(SortOrder.ASC, description="Sort order (asc/desc)"),
-    limit: int = Query(100, ge=1, le=1000, description="Maximum number of results to return"),
+    limit: int = Query(
+        100, ge=1, le=1000, description="Maximum number of results to return"
+    ),
     offset: int = Query(0, ge=0, description="Number of results to skip"),
     api_key: Optional[str] = Depends(get_api_key),
 ) -> dict:
     """
     List services via the unified provider abstraction with filtering, sorting, and pagination.
-    
+
     Features:
     - Multi-provider aggregation with fault tolerance
     - Flexible filtering by status and service type
     - Sorting by multiple fields (name, provider, status, created_at, region, service_type)
     - Pagination support (limit/offset)
     - Result caching for improved performance
-    
+
     Returns:
         Paginated response with items, total count, limit, and offset.
     """
@@ -179,13 +198,15 @@ def list_services(
     # Apply filters
     if status:
         services = [s for s in services if s.status.lower() == status.lower()]
-    
+
     if service_type:
-        services = [s for s in services if s.service_type.lower() == service_type.lower()]
-    
+        services = [
+            s for s in services if s.service_type.lower() == service_type.lower()
+        ]
+
     # Apply sorting
-    reverse = (sort_order == SortOrder.DESC)
-    
+    reverse = sort_order == SortOrder.DESC
+
     if sort_by == SortBy.NAME:
         services.sort(key=lambda s: s.name, reverse=reverse)
     elif sort_by == SortBy.PROVIDER:

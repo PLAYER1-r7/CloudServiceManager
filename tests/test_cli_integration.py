@@ -14,7 +14,9 @@ runner = CliRunner()
 
 
 @pytest.mark.integration
-def test_list_services_all_providers_aggregates_results(monkeypatch: pytest.MonkeyPatch):
+def test_list_services_all_providers_aggregates_results(
+    monkeypatch: pytest.MonkeyPatch,
+):
     """list-services should aggregate results from all providers."""
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -68,7 +70,9 @@ def test_list_services_all_providers_aggregates_results(monkeypatch: pytest.Monk
         mock_get_providers,
     )
 
-    result = runner.invoke(app, ["list-services", "--provider", "all", "--format", "json"])
+    result = runner.invoke(
+        app, ["list-services", "--provider", "all", "--format", "json"]
+    )
 
     assert result.exit_code == 0
     assert "i-aws-001" in result.stdout
@@ -105,7 +109,15 @@ def test_list_services_forwards_region_filter(monkeypatch: pytest.MonkeyPatch):
 
     result = runner.invoke(
         app,
-        ["list-services", "--provider", "aws", "--region", "ap-northeast-1", "--format", "json"],
+        [
+            "list-services",
+            "--provider",
+            "aws",
+            "--region",
+            "ap-northeast-1",
+            "--format",
+            "json",
+        ],
     )
 
     assert result.exit_code == 0
@@ -138,7 +150,15 @@ def test_get_service_cli_with_provider_dispatch(monkeypatch: pytest.MonkeyPatch)
 
     result = runner.invoke(
         app,
-        ["get-service", "--provider", "gcp", "--id", "instance-777", "--format", "json"],
+        [
+            "get-service",
+            "--provider",
+            "gcp",
+            "--id",
+            "instance-777",
+            "--format",
+            "json",
+        ],
     )
 
     assert result.exit_code == 0
