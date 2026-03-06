@@ -126,13 +126,35 @@
     - **レート制限**: SlowAPI ミドルウェア（毎分 100/30/60 リクエスト）
     - **キャッシング**: クエリパフォーマンス向上のための LRU キャッシュ（最大 128 キー）
     - **OpenAPI**: タグ、メタデータ付き強化版、version 2.0.0-beta
-  - 包括的な API テストスイートを作成 (`tests/test_api_main.py`、11テスト通過）
+  - **テスト & 品質保証:**
+    - 包括的な API テストスイート (`tests/test_api_main.py`、21テスト、`src/api/main.py` **100% カバレッジ**)
+    - 認証テスト (4テスト): 無効化、有効化キー無し、無効キー、有効キー
+    - ブランチカバレッジテスト (6テスト): cache_key、provider_safe ヘルパー、例外処理、ソート、エラーマッピング
+    - CI カバレッジゲートで今後のすべての変更で100% API カバレッジを強制
+    - E2E スモークテストスクリプト:
+      - `scripts/test_api_smoke.sh` - 包括的なエンドポイント検証
+      - `scripts/test_api_quick.sh` - クイック検証（8コアテスト）
+    - カスタムベースURLとAPIキー認証を使用した手動テストサポート
+  - **デプロイメント:**
+    - マルチステージビルドによる本番用 Dockerfile（イメージサイズ最適化）
+    - 簡単なデプロイと開発のための docker-compose.yml
+    - 包括的な設定ドキュメント付き .env.example
+    - 不要ファイルを除外する .dockerignore
+    - ヘルスチェックと非root ユーザー設定
+    - Docker ボリュームでのクラウドプロバイダー認証情報サポート
+  - **CI/CD & セキュリティ:**
+    - GitHub Actions でのセキュリティスキャンジョブ:
+      - Bandit: Python コードセキュリティスキャナー（medium 以上の深刻度）
+      - Safety: 依存関係脆弱性スキャナー
+      - セキュリティレポートをアーティファクトとしてアップロード（30日間保持）
+    - ハードコードされた認証情報のコード品質チェック
+    - Python 3.11/3.12 マトリックスでの自動テスト
   - API 起動スクリプトを作成 (`scripts/start_api.sh`)
-  - README.md と API 設計ドキュメントにすべての機能を記載
-  - 依存関係追加: fastapi, uvicorn, httpx, slowapi, python-multipart
+  - デプロイガイド、スモークテスト、本番ベストプラクティスを README.md に記載
+  - 依存関係追加: fastapi, uvicorn, httpx, slowapi, python-multipart, bandit, safety
   - インタラクティブ API ドキュメント (`/docs` と `/redoc`) 利用可能
-  - 全テスト成功: 183 passed, 1 skipped
-  - バージョン: 1.0.7.0 → 2.0.0-alpha → 2.0.0-alpha.2 → 2.0.0-beta
+  - 全テスト成功: 193 passed, 1 skipped
+  - バージョン: 1.0.7.0 → 2.0.0-alpha → 2.0.0-alpha.2 → 2.0.0-beta → 2.0.0 (本番対応)
 
 #### 🚧 実装中
 なし（Phase 1 対象はすべて完了）
