@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Cloud Service Manager API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudservicemanager-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      # API Configuration
+      - ENABLE_API_AUTH=${ENABLE_API_AUTH:-false}
+      - API_KEY=${API_KEY:-}
+      
+      # AWS Credentials (optional)
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_PROFILE=${AWS_PROFILE:-}
+      
+      # Azure Credentials (optional)
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID:-}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID:-}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET:-}
+      - AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID:-}
+      
+      # GCP Credentials (optional)
+      - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS:-}
+      - GCP_PROJECT=${GCP_PROJECT:-}
+    volumes:
+      # Mount cloud credential files if needed
+      - ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}:/home/appuser/.aws/credentials:ro
+      - ${GCP_CREDENTIALS_FILE:-~/.config/gcloud/application_default_credentials.json}:/home/appuser/.config/gcloud/application_default_credentials.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - cloudservicemanager-network
+
+networks:
+  cloudservicemanager-network:
+    driver: bridge

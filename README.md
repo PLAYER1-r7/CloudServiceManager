@@ -228,6 +228,108 @@ Both scripts test:
 
 **Note**: Provider authentication logs are expected if cloud credentials are not configured. Tests verify HTTP status codes regardless of data availability.
 
+## Deployment
+
+### Docker Deployment
+
+The application includes production-ready Docker configuration for easy deployment.
+
+#### Quick Start with Docker Compose
+
+1. **Copy environment template**
+
+```bash
+cp .env.example .env
+```
+
+2. **Edit .env file** and configure:
+   - API server settings (port, authentication)
+   - Cloud provider credentials (optional)
+
+3. **Start the API server**
+
+```bash
+docker-compose up -d
+```
+
+The API will be available at `http://localhost:8000`
+
+4. **View logs**
+
+```bash
+docker-compose logs -f api
+```
+
+5. **Stop the server**
+
+```bash
+docker-compose down
+```
+
+#### Manual Docker Build
+
+**Build the image:**
+
+```bash
+docker build -t cloudservicemanager-api:latest .
+```
+
+**Run the container:**
+
+```bash
+# Without authentication
+docker run -d \
+  --name cloudservicemanager-api \
+  -p 8000:8000 \
+  cloudservicemanager-api:latest
+
+# With API authentication
+docker run -d \
+  --name cloudservicemanager-api \
+  -p 8000:8000 \
+  -e ENABLE_API_AUTH=true \
+  -e API_KEY=your-secret-key \
+  cloudservicemanager-api:latest
+
+# With cloud provider credentials
+docker run -d \
+  --name cloudservicemanager-api \
+  -p 8000:8000 \
+  -e AWS_ACCESS_KEY_ID=your-key \
+  -e AWS_SECRET_ACCESS_KEY=your-secret \
+  -e AWS_DEFAULT_REGION=us-east-1 \
+  -v ~/.aws/credentials:/home/appuser/.aws/credentials:ro \
+  cloudservicemanager-api:latest
+```
+
+**Health check:**
+
+```bash
+docker ps  # Check container status
+curl http://localhost:8000/health
+```
+
+#### Environment Variables
+
+See [.env.example](.env.example) for complete configuration options:
+
+- **API_PORT**: Port to expose (default: 8000)
+- **ENABLE_API_AUTH**: Enable API key authentication (true/false)
+- **API_KEY**: Secret key for API authentication
+- **AWS_***: AWS credentials and configuration
+- **AZURE_***: Azure credentials and configuration
+- **GOOGLE_APPLICATION_CREDENTIALS**: Path to GCP service account key
+- **GCP_PROJECT**: Google Cloud project ID
+
+#### Production Considerations
+
+- **Use secrets management**: Don't commit `.env` file with real credentials
+- **Enable authentication**: Set `ENABLE_API_AUTH=true` and use a strong `API_KEY`
+- **Configure HTTPS**: Deploy behind a reverse proxy (nginx, Traefik) with SSL/TLS
+- **Monitor health**: Use the `/health` endpoint for health checks and monitoring
+- **Resource limits**: Configure Docker resource constraints for production
+- **Logging**: Redirect logs to a centralized logging system
+
 ## Development Workflow
 
 ### ⚠️ GitHub Project Status Management (MANDATORY)
