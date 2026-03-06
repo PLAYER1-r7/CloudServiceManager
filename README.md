@@ -78,6 +78,60 @@ python -m src.cli.main list-services --format csv
 
 See [03_API_DESIGN.md](docs/03_API_DESIGN.md) for complete CLI documentation.
 
+## Phase 2 Web API (Beta)
+
+Phase 2 introduces a FastAPI-based web API for programmatic access to cloud services.
+
+### Start API Server
+
+```bash
+# Using uvicorn directly
+uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
+
+# Or use the provided script (from project root)
+bash scripts/start_api.sh
+```
+
+The API will be available at `http://localhost:8000`
+
+### API Endpoints
+
+#### Health Check
+```bash
+curl http://localhost:8000/health
+```
+
+Response:
+```json
+{"status": "ok"}
+```
+
+#### List Services
+```bash
+# All providers
+curl http://localhost:8000/services
+
+# Specific provider
+curl http://localhost:8000/services?provider=aws
+
+# With region filter
+curl http://localhost:8000/services?provider=gcp&region=us-central1-a
+```
+
+#### Get Single Service
+```bash
+curl http://localhost:8000/services/aws/i-1234567890abcdef0
+```
+
+### Interactive API Documentation
+
+FastAPI provides automatic interactive API documentation:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+See [docs/03_API_DESIGN.md](docs/03_API_DESIGN.md) for complete API documentation.
+
 ## Development Workflow
 
 ### ⚠️ GitHub Project Status Management (MANDATORY)
@@ -183,22 +237,22 @@ This project uses **GitHub Projects** for task tracking and workflow management.
 
 ### 📝 Current Issues (7 total)
 
-#### ✅ Completed Issues (2/7)
+#### ✅ Completed Issues (7/7)
 
 | Issue | Title | Completion |
 |-------|-------|-----------|
+| [#1](https://github.com/PLAYER1-r7/CloudServiceManager/issues/1) | list-services コマンド実装完成 | ✅ Mar 2026 |
 | [#2](https://github.com/PLAYER1-r7/CloudServiceManager/issues/2) | CloudService データモデル完成・テスト | ✅ Mar 2026 |
+| [#3](https://github.com/PLAYER1-r7/CloudServiceManager/issues/3) | Week 3: GCP プロバイダー実装 | ✅ Mar 2026 |
+| [#4](https://github.com/PLAYER1-r7/CloudServiceManager/issues/4) | Week 4: 統合テストと最適化 | ✅ Mar 2026 |
+| [#5](https://github.com/PLAYER1-r7/CloudServiceManager/issues/5) | Week 2: AWS プロバイダー実装 | ✅ Mar 2026 |
 | [#6](https://github.com/PLAYER1-r7/CloudServiceManager/issues/6) | クラウドプロバイダー認証実装 | ✅ Mar 2026 |
+| [#7](https://github.com/PLAYER1-r7/CloudServiceManager/issues/7) | Week 3: Azure プロバイダー実装 | ✅ Mar 2026 |
 
-#### 🚧 Ongoing & Planned Issues (5/7)
+#### 🎯 Next Focus
 
-| Issue | Title | Week | Priority |
-|-------|-------|------|----------|
-| [#5](https://github.com/PLAYER1-r7/CloudServiceManager/issues/5) | Week 2: AWS プロバイダー実装 | Week 2 | 🟡 Medium |
-| [#1](https://github.com/PLAYER1-r7/CloudServiceManager/issues/1) | list-services コマンド実装完成 | - | 🟡 Medium |
-| [#3](https://github.com/PLAYER1-r7/CloudServiceManager/issues/3) | Week 3: GCP プロバイダー実装 | Week 3 | 🟢 Low |
-| [#7](https://github.com/PLAYER1-r7/CloudServiceManager/issues/7) | Week 3: Azure プロバイダー実装 | Week 3 | 🟢 Low |
-| [#4](https://github.com/PLAYER1-r7/CloudServiceManager/issues/4) | Week 4: 統合テストと最適化 | Week 4 | 🟢 Low |
+- Phase 1 planned scope is complete.
+- Next milestone is Phase 2 planning and API-first design refinement.
 
 ### 📚 Project Management Guides
 

@@ -4,34 +4,60 @@ Integration tests for AWS provider with CloudService model.
 Tests the conversion of AWS EC2 resources to the unified CloudService model.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from typing import NotRequired, TypedDict
+from unittest.mock import MagicMock, Mock
 
-from src.cli.models.service import CloudService, CloudProvider
+import pytest
+
+from src.cli.auth.aws_auth import AWSAuth
+from src.cli.models.service import CloudService
 from src.cli.providers.aws import AWSProvider
+
+
+class _StateDict(TypedDict):
+    Name: str
+
+
+class _PlacementDict(TypedDict):
+    AvailabilityZone: str
+
+
+class _EC2InstanceDict(TypedDict):
+    InstanceId: str
+    InstanceType: str
+    State: _StateDict
+    LaunchTime: datetime
+    ImageId: str
+    Placement: NotRequired[_PlacementDict]
 
 
 class TestAWSCloudServiceIntegration:
     """Integration tests between AWS provider and CloudService model."""
     
     @pytest.fixture
-    def mock_ec2_client(self):
+    def mock_ec2_client(self) -> MagicMock:
         """Fixture providing a mock EC2 client."""
         return MagicMock()
     
     @pytest.fixture
-    def aws_provider(self, mock_ec2_client):
+    def aws_provider(self, mock_ec2_client: MagicMock) -> AWSProvider:
         """Fixture providing AWSProvider with mocked EC2 client."""
-        with patch('boto3.client', return_value=mock_ec2_client):
-            provider = AWSProvider()
-        provider.ec2_client = mock_ec2_client
+        mock_auth = Mock(spec=AWSAuth)
+        mock_auth.is_authenticated.return_value = True
+        mock_auth.region = "us-east-1"
+
+        mock_session = Mock()
+        mock_session.client.return_value = mock_ec2_client
+        mock_auth.get_session.return_value = mock_session
+
+        provider = AWSProvider(auth=mock_auth)
         return provider
     
     def test_ec2_response_to_cloud_service_conversion(self):
         """Test converting AWS EC2 response to CloudService model."""
         # Simulated AWS EC2 instance response
-        ec2_instance = {
+        ec2_instance: _EC2InstanceDict = {
             "InstanceId": "i-0123456789abcdef0",
             "InstanceType": "t2.micro",
             "State": {"Name": "running"},
@@ -64,7 +90,7 @@ class TestAWSCloudServiceIntegration:
     
     def test_multiple_aws_instances_conversion(self):
         """Test converting multiple AWS EC2 instances to CloudService models."""
-        ec2_instances = [
+        ec2_instances: list[_EC2InstanceDict] = [
             {
                 "InstanceId": "i-0123456789abcdef0",
                 "InstanceType": "t2.micro",
@@ -81,7 +107,7 @@ class TestAWSCloudServiceIntegration:
             }
         ]
         
-        services = []
+        services: list[CloudService] = []
         for instance in ec2_instances:
             service = CloudService(
                 provider="aws",
@@ -126,11 +152,12 @@ class TestAWSCloudServiceIntegration:
         assert csv_dict["provider"] == "aws"
         assert csv_dict["name"] == "i-0123456789abcdef0"
     
-    @pytest.mark.skip(reason="Requires proper boto3 mocking setup")
-    def test_aws_provider_list_services_mock(self, aws_provider, mock_ec2_client):
+    def test_aws_provider_list_services_mock(
+        self, aws_provider: AWSProvider, mock_ec2_client: MagicMock
+    ):
         """Test AWSProvider.list_services with mocked EC2 client."""
         # Mock EC2 describe_instances response
-        mock_response = {
+        mock_response: dict[str, list[dict[str, list[_EC2InstanceDict]]]] = {
             "Reservations": [
                 {
                     "Instances": [
@@ -158,11 +185,12 @@ class TestAWSCloudServiceIntegration:
         assert services[0].name == "i-0123456789abcdef0"
         assert services[0].status == "running"
     
-    @pytest.mark.skip(reason="Requires proper boto3 mocking setup - replaced by test_aws_provider.py")
-    def test_aws_provider_get_service_mock(self, aws_provider, mock_ec2_client):
+    def test_aws_provider_get_service_mock(
+        self, aws_provider: AWSProvider, mock_ec2_client: MagicMock
+    ):
         """Test AWSProvider.get_service with mocked EC2 client."""
         # Mock EC2 describe_instances response for single instance
-        mock_response = {
+        mock_response: dict[str, list[dict[str, list[_EC2InstanceDict]]]] = {
             "Reservations": [
                 {
                     "Instances": [
@@ -181,8 +209,8 @@ class TestAWSCloudServiceIntegration:
         
         mock_ec2_client.describe_instances.return_value = mock_response
         
-        # Call get_service
-        service = aws_provider.get_service("i-0123456789abcdef0")
+        # Call get_service with explicit region to avoid scanning all regions
+        service = aws_provider.get_service("i-0123456789abcdef0", region="us-east-1")
         
         # Verify results
         assert service is not None

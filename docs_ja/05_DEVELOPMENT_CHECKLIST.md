@@ -9,7 +9,7 @@
 - **目的**: 開発セットアップの進捗状況と次のステップを追跡
 - **対象読者**: AIエージェント、開発者
 - **前提知識**: `04_SETUP.md` に従って環境セットアップが完了していること
-- **最終更新**: 2026-03-05
+- **最終更新**: 2026-03-06
 
 ---
 
@@ -77,14 +77,55 @@
   - すべてのテストがパス (130 パス、3 スキップ)
   - バージョン: 1.0.2.0 → 1.0.3.0
 
+- **Issue #3**: GCP プロバイダー実装 (完了)
+  - GCPAuth 統合済み GCPProvider クラス (255行)
+  - 単一または全ゾーンでの Compute Engine インスタンス一覧取得
+  - 包括的メタデータを含む CloudService モデル変換
+  - 包括的テストスイート (17テスト、79%カバレッジ)
+  - `test_gcp_provider.py` を作成
+  - バージョン: 1.0.3.0 → 1.0.4.0
+
+- **Issue #7**: Azure プロバイダー実装 (完了)
+  - AzureAuth 統合済み AzureProvider クラス (310行)
+  - 複数リソースグループ/リージョンでの VM 一覧取得
+  - Power state 抽出を含む CloudService モデル変換
+  - 包括的テストスイート (16テスト、83%カバレッジ)
+  - `test_azure_provider.py` を作成
+  - バージョン: 1.0.4.0 → 1.0.5.0
+
+- **Issue #1**: list-services コマンド実装 (完了)
+  - `aws|gcp|azure|all` の厳密な provider 選択を実装
+  - マルチプロバイダー集約と部分失敗時の警告表示を実装
+  - JSON / table / CSV 出力を統一モデルで実装
+  - CLI のユニットテストを追加
+  - バージョン: 1.0.5.0 → 1.0.6.0
+
+- **Issue #4**: 統合テストと最適化 (完了)
+  - CLI 統合テスト (`tests/test_cli_integration.py`) を追加
+  - region 引き渡しと provider dispatch の統合検証を追加
+  - 出力順の決定性と CSV 出力を最適化
+  - フルテスト結果: 172 passed, 1 skipped
+  - バージョン: 1.0.6.0 → 1.0.7.0
+
+- **Phase 2**: Web API スケルトン (進行中)
+  - FastAPI アプリケーションスケルトンを作成 (`src/api/main.py`)
+  - コアエンドポイントを実装:
+    - `GET /health` - ヘルスチェックエンドポイント
+    - `GET /services` - プロバイダー/リージョンフィルタ付きサービス一覧
+    - `GET /services/{provider}/{service_id}` - 特定サービスの詳細取得
+  - フォールトトレラントなプロバイダー初期化（利用不可プロバイダーをスキップ）
+  - API テストスイートを作成 (`tests/test_api_main.py`、4テスト通過）
+  - API 起動スクリプトを作成 (`scripts/start_api.sh`)
+  - README.md に API 利用方法を追記
+  - 依存関係追加: fastapi, uvicorn, httpx
+  - インタラクティブ API ドキュメント (`/docs` と `/redoc`) 利用可能
+  - バージョン: 1.0.7.0 → 2.0.0-alpha
+
 #### 🚧 実装中
-なし (待機中)
+なし（Phase 1 対象はすべて完了）
 
 #### 📋 保留中
-- Issue #1: list-services コマンド実装
-- Issue #3: GCP プロバイダー実装
-- Issue #7: Azure プロバイダー実装
-- Issue #4: 統合テストと最適化
+なし
 
 ### GitHub リポジトリセットアップ ✅
 
@@ -215,7 +256,7 @@ bash .github/scripts/update_project_status.sh <ISSUE番号> "Done"
 
 ### 現在のバージョン
 
-**VERSION: 1.0.1.7**（2026年3月5日現在）
+**VERSION: 1.0.7.0**（2026年3月6日現在）
 
 バージョン形式: `W.X.Y.Z`
 - W (Major): ユーザー指示による戦略的変更
@@ -270,35 +311,21 @@ bash .github/scripts/update_project_status.sh <ISSUE番号> "Done"
 
 ### 🚧 進行中
 
-#### Issue #6: クラウドプロバイダー認証実装
-- **ステータス**: 🚧 進行中
-- **担当**: 現在の作業アイテム
-- **目標カバレッジ**: 85%以上
-- **予定ファイル**:
-  - `src/cli/auth/base.py` - 基本認証インターフェース
-  - `src/cli/auth/aws_auth.py` - AWS 認証情報管理
-  - `src/cli/auth/gcp_auth.py` - GCP 認証情報管理
-  - `src/cli/auth/azure_auth.py` - Azure 認証情報管理
-  - `src/cli/auth/manager.py` - 統合認証マネージャー
-- **実装計画**: [.github/ISSUE6_IMPLEMENTATION_PLAN.md](../.github/ISSUE6_IMPLEMENTATION_PLAN.md)
+- なし。Phase 1 の Issue #1 - #7 はすべて完了。
 
 ### 📅 今後の作業
 
-[GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1) に基づく:
-
-1. **Issue #5**: Week 2: AWS プロバイダー実装（Backlog）
-2. **Issue #1**: list-services コマンド実装完成（Backlog）
-3. **Issue #3**: Week 3: GCP プロバイダー実装（Backlog）
-4. **Issue #7**: Week 3: Azure プロバイダー実装（Backlog）
-5. **Issue #4**: Week 4: 統合テストと最適化（Backlog）
+1. Phase 2 API 設計タスクの整理
+2. FastAPI エンドポイントとデータ契約の提案作成
+3. Phase 1 完了のリリースノートとタグ準備
 
 ### 📈 進捗メトリクス
 
-- **完了 Issue**: 1/7（14%）
-- **テストカバレッジ**: 95%（CloudService モデル）
-- **バージョン**: 1.0.1.7
-- **コミット数**: 8 件（PR #17 の 6 件 + インフラ 2 件）
-- **ファイル数**: リポジトリ内 150 ファイル以上
+- **完了 Issue**: 7/7（100%）
+- **全体テストカバレッジ**: 85%（`src` 全体）
+- **CLIカバレッジ**: 85%（`src/cli/main.py` の unit + integration）
+- **テスト結果**: 172 passed, 1 skipped
+- **バージョン**: 1.0.7.0
 
 ---
 
@@ -394,5 +421,5 @@ pytest tests/test_main.py::test_specific_function -v
 
 ---
 
-**最終更新日**: 2026-03-05  
+**最終更新日**: 2026-03-06  
 **前のドキュメント**: [04_SETUP.md](04_SETUP.md)

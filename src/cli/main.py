@@ -2,17 +2,18 @@
 Main CLI entry point for Cloud Service Manager.
 """
 
-import typer
 import json
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+import typer
 from rich.console import Console
 from rich.table import Table
 
 from .models.service import CloudProvider
 from .providers.aws import AWSProvider
-from .providers.gcp import GCPProvider
 from .providers.azure import AzureProvider
+from .providers.gcp import GCPProvider
 
 app = typer.Typer(
     name="CloudServiceManager",
@@ -29,10 +30,19 @@ class OutputFormat(str, Enum):
     CSV = "csv"
 
 
+class ProviderOption(str, Enum):
+    """Provider selection options for list-services."""
+
+    AWS = "aws"
+    GCP = "gcp"
+    AZURE = "azure"
+    ALL = "all"
+
+
 @app.command()
 def list_services(
-    provider: Optional[str] = typer.Option(
-        None,
+    provider: ProviderOption = typer.Option(
+        ProviderOption.ALL,
         "--provider",
         "-p",
         help="Cloud provider (aws, gcp, azure, or 'all')"
@@ -64,11 +74,22 @@ def list_services(
         
         # Fetch services from all specified providers
         all_services = []
+        provider_errors = []
         for prov in providers:
-            services = prov.list_services(region)
-            all_services.extend(services)
+            try:
+                services = prov.list_services(region)
+                all_services.extend(services)
+            except Exception as e:
+                provider_name = prov.__class__.__name__.replace("Provider", "").lower()
+                provider_errors.append(f"{provider_name}: {e}")
+
+        if provider_errors:
+            for err in provider_errors:
+                console.print(f"[yellow]Warning[/yellow]: failed to fetch from {err}")
         
         if not all_services:
+            if provider_errors:
+                raise RuntimeError("All requested providers failed")
             console.print("[yellow]No services found.[/yellow]")
             return
         
@@ -133,12 +154,12 @@ def init_config():
     console.print("[green]Configuration Guide: See docs/SETUP.md[/green]")
 
 
-def _get_providers(provider: Optional[str] = None) -> list:
+def _get_providers(provider: ProviderOption = ProviderOption.ALL) -> list:
     """Get provider instances based on specification."""
-    if provider is None or provider.lower() == "all":
+    if provider == ProviderOption.ALL:
         return [AWSProvider(), GCPProvider(), AzureProvider()]
     
-    return [_get_provider(provider)]
+    return [_get_provider(provider.value)]
 
 
 def _get_provider(provider: str):
@@ -158,9 +179,15 @@ def _get_provider(provider: str):
 
 def _output_services(services, format: OutputFormat):
     """Output services in the specified format."""
+    # Keep output deterministic for easier comparison and testing.
+    sorted_services = sorted(
+        services,
+        key=lambda s: (str(s.provider), str(s.region), str(s.service_type), str(s.name)),
+    )
+
     if format == OutputFormat.JSON:
-        output = [s.to_dict() for s in services]
-        console.print_json(data=output)
+        output = [s.to_dict() for s in sorted_services]
+        console.print_json(json.dumps(output, indent=2))
     
     elif format == OutputFormat.TABLE:
         table = Table(title="Cloud Services")
@@ -170,9 +197,9 @@ def _output_services(services, format: OutputFormat):
         table.add_column("Region", style="yellow")
         table.add_column("Status", style="blue")
         
-        for service in services:
+        for service in sorted_services:
             table.add_row(
-                service.provider.value,
+                service.provider,
                 service.service_type,
                 service.name,
                 service.region,
@@ -186,11 +213,11 @@ def _output_services(services, format: OutputFormat):
         import io
         
         output = io.StringIO()
-        if services:
-            writer = csv.DictWriter(output, fieldnames=services[0].to_dict().keys())
+        if sorted_services:
+            csv_rows = [service.to_csv_dict() for service in sorted_services]
+            writer = csv.DictWriter(output, fieldnames=csv_rows[0].keys())
             writer.writeheader()
-            for service in services:
-                writer.writerow(service.to_dict())
+            writer.writerows(csv_rows)
         
         console.print(output.getvalue())
 

@@ -318,3 +318,53 @@ When implementing a new provider:
 
 **Last Updated**: 2026-03-05  
 **Next Document**: [04_SETUP.md](04_SETUP.md)
+
+---
+
+## **🌐 Phase 2 API Skeleton (FastAPI)**
+
+Phase 2 has started with a minimal FastAPI backend skeleton.
+
+### Base Implementation
+
+- Entry point: `src/api/main.py`
+- Framework: FastAPI
+- Goal: Reuse existing provider implementations via API endpoints
+
+### Endpoints (Initial)
+
+#### `GET /health`
+- Purpose: Liveness/readiness check
+- Response:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+#### `GET /services`
+- Purpose: List services from one or all providers
+- Query parameters:
+  - `provider`: `aws | gcp | azure | all` (default: `all`)
+  - `region`: Optional region/zone filter
+- Response: `CloudService[]`
+
+#### `GET /services/{provider}/{service_id}`
+- Purpose: Retrieve a specific service from a provider
+- Path parameters:
+  - `provider`: `aws | gcp | azure`
+  - `service_id`: provider-specific service identifier
+- Response: `CloudService`
+- Errors:
+  - `400`: unsupported provider
+  - `404`: service not found
+
+### Test Coverage
+
+- New test file: `tests/test_api_main.py`
+- Covered scenarios:
+  - `/health` success
+  - `/services` list response
+  - `/services/{provider}/{service_id}` success
+  - `/services/{provider}/{service_id}` not found

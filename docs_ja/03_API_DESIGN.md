@@ -321,6 +321,56 @@ class CloudProviderBase(ABC):
 **最終更新日**: 2026-03-05  
 **次のドキュメント**: [04_SETUP.md](04_SETUP.md)
 
+---
+
+## **🌐 Phase 2 API スケルトン（FastAPI）**
+
+Phase 2 として、最小構成の FastAPI バックエンドを開始しました。
+
+### 基本実装
+
+- エントリーポイント: `src/api/main.py`
+- フレームワーク: FastAPI
+- 方針: 既存のプロバイダー実装を API から再利用
+
+### 初期エンドポイント
+
+#### `GET /health`
+- 目的: Liveness / Readiness チェック
+- レスポンス:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+#### `GET /services`
+- 目的: 単一または全プロバイダーからサービス一覧を取得
+- クエリパラメータ:
+  - `provider`: `aws | gcp | azure | all`（デフォルト: `all`）
+  - `region`: 任意のリージョン/ゾーンフィルタ
+- レスポンス: `CloudService[]`
+
+#### `GET /services/{provider}/{service_id}`
+- 目的: 指定プロバイダーから特定サービスを取得
+- パスパラメータ:
+  - `provider`: `aws | gcp | azure`
+  - `service_id`: プロバイダー固有ID
+- レスポンス: `CloudService`
+- エラー:
+  - `400`: 未対応プロバイダー
+  - `404`: サービス未検出
+
+### テストカバレッジ
+
+- 追加テスト: `tests/test_api_main.py`
+- 検証内容:
+  - `/health` の成功応答
+  - `/services` の一覧応答
+  - `/services/{provider}/{service_id}` の成功応答
+  - `/services/{provider}/{service_id}` の 404 応答
+
 - Missing or invalid credentials
 - Network errors
 - Invalid service IDs

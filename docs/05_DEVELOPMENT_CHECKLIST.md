@@ -9,7 +9,7 @@
 - **Purpose**: Track development setup progress and next steps
 - **Audience**: AI Agents, Developers
 - **Prerequisites**: Environment setup completed per `04_SETUP.md`
-- **Last Updated**: 2026-03-05
+- **Last Updated**: 2026-03-06
 
 ---
 
@@ -77,14 +77,69 @@
   - All tests passing (130 passed, 3 skipped)
   - Version: 1.0.2.0 → 1.0.3.0
 
+- **Issue #3**: GCP Provider Implementation (DONE)
+  - GCPProvider class with GCPAuth integration (255 lines)
+  - Compute Engine instance listing across single or all zones
+  - CloudService model conversion with comprehensive metadata
+  - Error handling for unauthorized zones and missing instances
+  - Support for multiple authentication methods via GCPAuth
+  - Comprehensive test suite (17 tests, 79% coverage)
+  - Created `test_gcp_provider.py` with complete test coverage
+  - All tests passing (17 passed)
+  - Version: 1.0.3.0 → 1.0.4.0
+
+- **Issue #7**: Azure Provider Implementation (DONE)
+  - AzureProvider class with AzureAuth integration (310 lines)
+  - Virtual Machine listing across single or all resource groups and regions
+  - CloudService model conversion with comprehensive metadata
+  - Error handling for unauthorized resource groups and missing VMs
+  - Support for multiple authentication methods via AzureAuth
+  - Power state extraction from instance views
+  - Comprehensive test suite (16 tests, 83% coverage)
+  - Created `test_azure_provider.py` with complete test coverage
+  - All tests passing (16 passed)
+  - Version: 1.0.4.0 → 1.0.5.0
+
+- **Issue #1**: list-services Command Implementation (DONE)
+  - Implemented provider selection with strict choices (`aws|gcp|azure|all`)
+  - Added robust multi-provider aggregation with partial-failure warnings
+  - Added JSON/table/CSV output handling using unified `CloudService` serialization
+  - Fixed table rendering for string-based provider values
+  - Added unit tests for JSON/CSV output and failure handling behavior
+  - All CLI tests passing
+  - Version: 1.0.5.0 → 1.0.6.0
+
+- **Issue #4**: Integration Tests and Optimization (DONE)
+  - Added CLI integration test suite (`tests/test_cli_integration.py`)
+  - Added multi-provider aggregation integration verification
+  - Added region filter pass-through integration verification
+  - Added get-service provider dispatch integration verification
+  - Re-enabled AWS integration tests previously skipped due mocking setup
+  - Optimized deterministic output ordering in `main.py`
+  - Optimized CSV output generation with batched row serialization
+  - Full test suite stabilized at `172 passed, 1 skipped`
+  - CLI unit + integration coverage for `src/cli/main.py` reached 85%
+  - Version: 1.0.6.0 → 1.0.7.0
+
+- **Phase 2**: Web API Skeleton (IN PROGRESS)
+  - Created FastAPI application skeleton (`src/api/main.py`)
+  - Implemented core endpoints:
+    - `GET /health` - Health check endpoint
+    - `GET /services` - List services with provider/region filtering
+    - `GET /services/{provider}/{service_id}` - Get specific service details
+  - Added fault-tolerant provider initialization (skips unavailable providers)
+  - Created API test suite (`tests/test_api_main.py`, 4 tests passing)
+  - Created API startup script (`scripts/start_api.sh`)
+  - Updated README.md with API usage documentation
+  - Dependencies added: fastapi, uvicorn, httpx
+  - Interactive API docs available at `/docs` and `/redoc`
+  - Version: 1.0.7.0 → 2.0.0-alpha
+
 #### 🚧 In Progress
 None currently idle
 
 #### 📋 Pending
-- Issue #1: list-services Command Implementation  
-- Issue #3: GCP Provider Implementation
-- Issue #7: Azure Provider Implementation
-- Issue #4: Integration Tests and Optimization
+None
 
 ### GitHub Repository Setup ✅
 
@@ -213,7 +268,7 @@ Detailed workflow guide: [.github/PROJECT_WORKFLOW.md](../.github/PROJECT_WORKFL
 
 ### Current Version
 
-**VERSION: 1.0.1.7** (as of 2026-03-05)
+**VERSION: 1.0.7.0** (as of 2026-03-06)
 
 Version format: `W.X.Y.Z`
 - W (Major): User-directed strategic changes
@@ -268,35 +323,21 @@ See [01_PREREQUISITES.md](01_PREREQUISITES.md) for detailed versioning rules.
 
 ### 🚧 In Progress
 
-#### Issue #6: クラウドプロバイダー認証実装
-- **Status**: 🚧 In Progress
-- **Assigned**: Current work item
-- **Target Coverage**: 85%+
-- **Planned Files**:
-  - `src/cli/auth/base.py` - Base authentication interface
-  - `src/cli/auth/aws_auth.py` - AWS credential management
-  - `src/cli/auth/gcp_auth.py` - GCP credential management
-  - `src/cli/auth/azure_auth.py` - Azure credential management
-  - `src/cli/auth/manager.py` - Unified auth manager
-- **Implementation Plan**: [.github/ISSUE6_IMPLEMENTATION_PLAN.md](../.github/ISSUE6_IMPLEMENTATION_PLAN.md)
+- None. All Phase 1 issues (#1 - #7) are completed.
 
 ### 📅 Upcoming Work
 
-Based on [GitHub Project Board](https://github.com/users/PLAYER1-r7/projects/1):
-
-1. **Issue #5**: Week 2: AWS プロバイダー実装 (Backlog)
-2. **Issue #1**: list-services コマンド実装完成 (Backlog)
-3. **Issue #3**: Week 3: GCP プロバイダー実装 (Backlog)
-4. **Issue #7**: Week 3: Azure プロバイダー実装 (Backlog)
-5. **Issue #4**: Week 4: 統合テストと最適化 (Backlog)
+1. Prepare Phase 2 API planning tasks.
+2. Define FastAPI endpoints and data contract proposals.
+3. Add release notes and tag Phase 1 completion.
 
 ### 📈 Progress Metrics
 
-- **Issues Completed**: 1/7 (14%)
-- **Test Coverage**: 95% (CloudService model)
-- **Version**: 1.0.1.7
-- **Commits**: 8 total (6 in PR #17 + 2 infrastructure)
-- **Files**: 150+ files in repository
+- **Issues Completed**: 7/7 (100%)
+- **Test Coverage**: 85% (overall `src` coverage)
+- **CLI Coverage**: 85% (`src/cli/main.py` unit + integration)
+- **Test Results**: 172 passed, 1 skipped
+- **Version**: 1.0.7.0
 
 ---
 
@@ -342,12 +383,7 @@ pytest --cov=src            # Coverage report
 pytest -k "aws"             # Run specific tests
 
 # CLI Usage
-pyt
-
----
-
-**Last Updated**: 2026-03-05  
-**Previous Document**: [04_SETUP.md](04_SETUP.md)hon -m src.cli.main list-services
+python -m src.cli.main list-services
 python -m src.cli.main list-services --provider aws --format json
 ```
 
@@ -360,6 +396,11 @@ docker volume prune          # Clean up old volumes
 docker system prune         # Clean up unused images/containers
 # Then reopen in container
 ```
+
+---
+
+**Last Updated**: 2026-03-06  
+**Previous Document**: [04_SETUP.md](04_SETUP.md)
 
 ### Dependencies not installing
 
