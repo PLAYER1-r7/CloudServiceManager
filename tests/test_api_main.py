@@ -364,3 +364,65 @@ def test_pagination_has_more_false(monkeypatch) -> None:
     assert payload["has_more"] is False
     assert len(payload["items"]) == 25
 
+
+def test_auth_disabled_allows_request_without_api_key(monkeypatch) -> None:
+    """When auth is disabled, requests should succeed without X-API-Key."""
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return []
+
+    monkeypatch.delenv("ENABLE_API_AUTH", raising=False)
+    monkeypatch.delenv("API_KEY", raising=False)
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    response = client.get("/services")
+    assert response.status_code == 200
+
+
+def test_auth_enabled_without_configured_api_key_returns_500(monkeypatch) -> None:
+    """When auth is enabled but API_KEY is missing, endpoint should return 500."""
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return []
+
+    monkeypatch.setenv("ENABLE_API_AUTH", "true")
+    monkeypatch.delenv("API_KEY", raising=False)
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    response = client.get("/services")
+    assert response.status_code == 500
+    assert "API_KEY" in response.json()["detail"]
+
+
+def test_auth_enabled_with_invalid_api_key_returns_401(monkeypatch) -> None:
+    """When auth is enabled, invalid key should be rejected."""
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return []
+
+    monkeypatch.setenv("ENABLE_API_AUTH", "true")
+    monkeypatch.setenv("API_KEY", "expected-secret")
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    response = client.get("/services", headers={"X-API-Key": "wrong-secret"})
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid or missing API key"
+
+
+def test_auth_enabled_with_valid_api_key_returns_200(monkeypatch) -> None:
+    """When auth is enabled, valid key should allow access."""
+
+    class ProviderMock:
+        def list_services(self, region=None):
+            return []
+
+    monkeypatch.setenv("ENABLE_API_AUTH", "true")
+    monkeypatch.setenv("API_KEY", "expected-secret")
+    monkeypatch.setattr(api_main, "_get_providers_safe", lambda provider: [ProviderMock()])
+
+    response = client.get("/services", headers={"X-API-Key": "expected-secret"})
+    assert response.status_code == 200
+
